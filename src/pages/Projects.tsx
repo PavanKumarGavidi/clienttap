@@ -22,10 +22,11 @@ export default function Projects() {
   const totalReceived = projects.reduce((s, p) => s + p.received, 0);
   const totalPending = projects.reduce((s, p) => s + p.pending, 0);
 
-  const cardClass = `rounded-xl border ${darkMode ? 'bg-[#1a1a1a] border-white/10' : 'bg-white border-gray-200'}`;
+  const cardClass = `rounded-xl border bg-white`;
+  const cardBorder = { borderColor: '#E7E5E4' };
 
   return (
-    <div className="p-4 lg:p-8 max-w-7xl mx-auto animate-fade-in">
+    <div className="p-4 lg:p-8 max-w-7xl mx-auto animate-fade-in" style={{ backgroundColor: '#FAFAF8' }}>
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>

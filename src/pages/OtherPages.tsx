@@ -14,7 +14,7 @@ interface Props {
 
 export default function OtherPages({ page }: Props) {
   const { darkMode } = useApp();
-  const cardClass = `rounded-xl border ${darkMode ? 'bg-[#1a1a1a] border-white/10' : 'bg-white border-gray-200'}`;
+  const cardClass = `rounded-xl border bg-white`;
 
   switch (page) {
     case 'messages': return <MessagesPage />;

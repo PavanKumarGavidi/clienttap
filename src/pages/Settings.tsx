@@ -7,9 +7,9 @@ export default function Settings() {
   const { darkMode } = useApp();
   const [activeSection, setActiveSection] = useState('profile');
 
-  const cardClass = `rounded-xl border ${darkMode ? 'bg-[#1a1a1a] border-white/10' : 'bg-white border-gray-200'}`;
-  const inputClass = `w-full px-4 py-2.5 rounded-lg text-sm ${darkMode ? 'bg-white/5 border-white/10 text-white placeholder:text-gray-500' : 'bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400'} border focus:outline-none focus:ring-2 focus:ring-orange-500/50`;
-  const labelClass = `block text-sm font-medium mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`;
+  const cardClass = `rounded-xl border bg-white`;
+  const inputClass = `w-full px-4 py-2.5 rounded-lg text-sm bg-white border focus:outline-none focus:ring-2 focus:ring-orange-500/30`;
+  const labelClass = `block text-sm font-medium mb-1.5`;
 
   const sections = [
     { id: 'profile', label: 'Profile', icon: Users },

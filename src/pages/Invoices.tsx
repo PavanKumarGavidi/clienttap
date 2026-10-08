@@ -31,10 +31,11 @@ export default function Invoices() {
     return <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${styles[status] || styles.draft}`}>{labels[status] || status}</span>;
   };
 
-  const cardClass = `rounded-xl border ${darkMode ? 'bg-[#1a1a1a] border-white/10' : 'bg-white border-gray-200'}`;
+  const cardClass = `rounded-xl border bg-white`;
+  const cardBorder = { borderColor: '#E7E5E4' };
 
   return (
-    <div className="p-4 lg:p-8 max-w-7xl mx-auto animate-fade-in">
+    <div className="p-4 lg:p-8 max-w-7xl mx-auto animate-fade-in" style={{ backgroundColor: '#FAFAF8' }}>
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>

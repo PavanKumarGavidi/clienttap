@@ -18,7 +18,7 @@ export default function Portal() {
   const clientDocs = documents.filter(d => d.clientId === 'c1');
   const totalOwed = clientInvoices.filter(i => i.status !== 'paid').reduce((s, i) => s + i.amount, 0);
 
-  const cardClass = `rounded-xl border ${darkMode ? 'bg-[#1a1a1a] border-white/10' : 'bg-white border-gray-200'}`;
+  const cardClass = `rounded-xl border bg-white`;
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: FolderOpen },
