@@ -1,6 +1,7 @@
 import { useState, useEffect, createContext, useContext } from 'react';
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { StoreProvider } from './store/StoreContext';
+import { auth } from './lib/auth';
 import MarketingSite from './components/Marketing';
 import AppLayout from './components/AppLayout';
 import AuthPages from './components/AuthPages';
@@ -25,29 +26,46 @@ export const AppContext = createContext<AppContextType>({
 
 export const useApp = () => useContext(AppContext);
 
-export default function App() {
-  const [darkMode, setDarkMode] = useState(false);
+// Protected route wrapper
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
+  
+  if (!auth.isAuthenticated()) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+  
+  return <>{children}</>;
+}
 
+// Public route wrapper - redirects to app if already logged in
+function PublicRoute({ children }: { children: React.ReactNode }) {
+  if (auth.isAuthenticated()) {
+    return <Navigate to="/app/dashboard" replace />;
+  }
+  return <>{children}</>;
+}
+
+function AppContent() {
+  const [darkMode, setDarkMode] = useState(false);
   const toggleDarkMode = () => setDarkMode(!darkMode);
 
   return (
     <AppContext.Provider value={{ darkMode, toggleDarkMode }}>
       <StoreProvider>
-      <Router>
         <Routes>
-          {/* Marketing Site */}
+          {/* Marketing Site - Public */}
           <Route path="/" element={<MarketingSite />} />
           <Route path="/pricing" element={<MarketingSite />} />
           <Route path="/features" element={<MarketingSite />} />
           <Route path="/demo" element={<MarketingSite />} />
           
-          {/* Auth Pages */}
-          <Route path="/signup" element={<AuthPages />} />
+          {/* Auth Pages - Public (redirect if logged in) */}
+          <Route path="/signup" element={<PublicRoute><AuthPages /></PublicRoute>} />
           <Route path="/login" element={<AuthPages />} />
           <Route path="/forgot-password" element={<AuthPages />} />
 
-          {/* App Routes */}
-          <Route path="/app" element={<AppLayout />}>
+          {/* App Routes - Protected */}
+          <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
             <Route index element={<Dashboard />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="leads" element={<Leads />} />
@@ -65,14 +83,21 @@ export default function App() {
             <Route path="settings" element={<Settings />} />
           </Route>
 
-          {/* Client Portal */}
+          {/* Client Portal - Public */}
           <Route path="/portal" element={<Portal />} />
           <Route path="/portal/:slug" element={<Portal />} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </Router>
       </StoreProvider>
     </AppContext.Provider>
+  );
+}
+
+export default function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
   );
 }

@@ -192,7 +192,7 @@ export default function Projects() {
                 {/* Team & Deadline */}
                 <div className="flex items-center justify-between pt-3 border-t border-dashed border-gray-200 dark:border-white/10">
                   <div className="flex -space-x-2">
-                    {project.team.slice(0, 3).map((memberId) => {
+                    {project.team.slice(0, 3).map((memberId: string) => {
                       const member = getMember(memberId);
                       return (
                         <div key={memberId} className={`w-7 h-7 rounded-full flex items-center justify-center text-xs border-2 ${darkMode ? 'border-[#1a1a1a] bg-white/10' : 'border-white bg-gray-100'}`} title={member?.name}>

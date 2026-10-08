@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../App';
+import { auth } from '../lib/auth';
 import { plans } from '../data/mockData';
 import { 
   Zap, Shield, Users, FileText, CreditCard, MessageSquare, Star, 
@@ -75,8 +76,17 @@ export default function MarketingSite() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <button onClick={() => navigate('/login')} className="hidden sm:block text-sm font-medium transition hover:text-orange-600" style={{ color: '#78716C' }}>Sign in</button>
-              <button onClick={() => navigate('/signup')} className="btn-primary text-sm !py-2 !px-4">Start free</button>
+              {auth.isAuthenticated() ? (
+                <>
+                  <button onClick={() => navigate('/app/dashboard')} className="hidden sm:block text-sm font-medium transition hover:text-orange-600" style={{ color: '#78716C' }}>Go to app</button>
+                  <button onClick={() => navigate('/app/dashboard')} className="btn-primary text-sm !py-2 !px-4">Dashboard</button>
+                </>
+              ) : (
+                <>
+                  <button onClick={() => navigate('/login')} className="hidden sm:block text-sm font-medium transition hover:text-orange-600" style={{ color: '#78716C' }}>Sign in</button>
+                  <button onClick={() => navigate('/signup')} className="btn-primary text-sm !py-2 !px-4">Start free</button>
+                </>
+              )}
               <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="lg:hidden p-2">
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>

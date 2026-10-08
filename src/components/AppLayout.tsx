@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useApp } from '../App';
 import { useStore } from '../store/StoreContext';
-import { workspace, currentUser } from '../data/mockData';
+import { teamMembers } from '../data/mockData';
 import {
   LayoutDashboard, Users, UserCircle, FolderKanban, CreditCard,
   MessageSquare, Calendar, CheckSquare, FileText, UserCog,
@@ -38,8 +38,13 @@ export default function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
 
-  const { notifications, markNotificationRead, markAllNotificationsRead } = store;
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const { notifications, markNotificationRead, markAllNotificationsRead, currentUser, currentWorkspace, logout } = store;
+  const unreadCount = notifications.filter((n: any) => !n.read).length;
+  
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <div className="min-h-screen flex" style={{ backgroundColor: '#FAFAF8' }}>
@@ -69,11 +74,11 @@ export default function AppLayout() {
         <div className="px-4 py-3 border-b" style={{ borderColor: '#E7E5E4' }}>
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-lg flex items-center justify-center text-lg" style={{ backgroundColor: '#FFF8F2' }}>
-              {workspace.logo}
+              {currentWorkspace?.logo || '🏢'}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold truncate" style={{ color: '#1C1917' }}>{workspace.name}</p>
-              <p className="text-xs" style={{ color: '#78716C' }}>Pro plan · 5 seats</p>
+              <p className="text-sm font-semibold truncate" style={{ color: '#1C1917' }}>{currentWorkspace?.name || 'My Workspace'}</p>
+              <p className="text-xs" style={{ color: '#78716C' }}>{currentWorkspace?.plan ? currentWorkspace.plan.charAt(0).toUpperCase() + currentWorkspace.plan.slice(1) : 'Free'} plan</p>
             </div>
           </div>
         </div>
@@ -134,13 +139,13 @@ export default function AppLayout() {
         <div className="p-3 border-t" style={{ borderColor: '#E7E5E4' }}>
           <div className="flex items-center gap-2.5 px-2 py-1.5">
             <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold" style={{ backgroundColor: '#FFF8F2', color: '#c2410c' }}>
-              {currentUser.name.charAt(0)}
+              {currentUser?.avatar || currentUser?.name?.charAt(0) || '👤'}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium truncate" style={{ color: '#1C1917' }}>{currentUser.name}</p>
-              <p className="text-xs truncate" style={{ color: '#78716C' }}>Owner</p>
+              <p className="text-sm font-medium truncate" style={{ color: '#1C1917' }}>{currentUser?.name || 'User'}</p>
+              <p className="text-xs truncate" style={{ color: '#78716C' }}>{currentUser?.role || 'owner'}</p>
             </div>
-            <button onClick={() => navigate('/')} className="p-1.5 rounded-lg hover:bg-stone-100 transition" title="Sign out">
+            <button onClick={handleLogout} className="p-1.5 rounded-lg hover:bg-stone-100 transition" title="Sign out">
               <LogOut className="w-4 h-4" style={{ color: '#78716C' }} />
             </button>
           </div>

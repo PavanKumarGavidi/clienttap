@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '../App';
 import { useStore } from '../store/StoreContext';
-import { currentUser, revenueData, revenueByType, leadsBySource } from '../data/mockData';
+import { revenueData, revenueByType, leadsBySource } from '../data/mockData';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, CartesianGrid } from 'recharts';
 import { TrendingUp, Users, FolderOpen, Clock, Plus, Calendar, ArrowRight, Repeat, X } from 'lucide-react';
 
@@ -95,7 +95,7 @@ export default function Dashboard() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-display-sm font-bold tracking-tight" style={ink}>
-          Welcome back, {currentUser.name.split(' ')[0]}
+          Welcome back, {store.currentUser?.name.split(' ')[0] || 'there'}
         </h1>
         <p className="mt-1 text-sm" style={inkMuted}>
           Here's what's happening with your business today.

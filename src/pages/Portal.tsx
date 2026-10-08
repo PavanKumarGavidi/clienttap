@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../App';
 import { useStore } from '../store/StoreContext';
-import { workspace, projects, invoices, documents, reviews } from '../data/mockData';
+import { reviews } from '../data/mockData';
 import { Zap, FolderOpen, FileText, CreditCard, MessageSquare, Star, MessageCircle, Send, CheckCircle, Clock, Download, ArrowLeft, Bell, User, LogOut } from 'lucide-react';
 
 export default function Portal() {
@@ -15,11 +15,12 @@ export default function Portal() {
   
   // Simulating a logged-in client view
   const clientName = 'GreenLeaf Organics';
-  const clientProjects = projects.filter(p => p.clientId === 'c1');
-  const clientInvoices = invoices.filter(i => i.clientId === 'c1');
-  const clientMessages = store.messages.filter(m => m.clientId === 'c1');
-  const clientDocs = documents.filter(d => d.clientId === 'c1');
-  const totalOwed = clientInvoices.filter(i => i.status !== 'paid').reduce((s: number, i: any) => s + i.amount, 0);
+  const clientProjects = store.projects.filter((p: any) => p.clientId === 'c1');
+  const clientInvoices = store.invoices.filter((i: any) => i.clientId === 'c1');
+  const clientMessages = store.messages.filter((m: any) => m.clientId === 'c1');
+  const clientDocs = store.documents.filter((d: any) => d.clientId === 'c1');
+  const totalOwed = clientInvoices.filter((i: any) => i.status !== 'paid').reduce((s: number, i: any) => s + i.amount, 0);
+  const workspaceName = store.currentWorkspace?.name || 'Pixel & Code Studio';
 
   const cardClass = `rounded-xl border bg-white`;
 
@@ -59,7 +60,7 @@ export default function Portal() {
                 <Zap className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="text-sm font-bold">{workspace.name}</p>
+                <p className="text-sm font-bold">{workspaceName}</p>
                 <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>Client Portal</p>
               </div>
             </div>
@@ -264,7 +265,7 @@ export default function Portal() {
             {activeSection === 'messages' && (
               <div className={`${cardClass} animate-fade-in`}>
                 <div className={`p-4 border-b ${darkMode ? 'border-white/10' : 'border-gray-100'}`}>
-                  <h2 className="font-semibold">Messages with {workspace.name}</h2>
+                  <h2 className="font-semibold">Messages with {workspaceName}</h2>
                 </div>
                 <div className="p-4 space-y-4 max-h-96 overflow-y-auto">
                   {clientMessages.map((msg) => {

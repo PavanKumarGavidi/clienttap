@@ -1,11 +1,16 @@
 import { useState } from 'react';
 import { useApp } from '../App';
-import { workspace, currentUser, pipelineStages } from '../data/mockData';
+import { useStore } from '../store/StoreContext';
+import { pipelineStages } from '../data/mockData';
 import { Save, Upload, Globe, Shield, CreditCard, Bell, Palette, Database, AlertTriangle, Users, FileText, Key } from 'lucide-react';
 
 export default function Settings() {
   const { darkMode } = useApp();
+  const store = useStore();
   const [activeSection, setActiveSection] = useState('profile');
+  
+  const currentUser = store.currentUser;
+  const currentWorkspace = store.currentWorkspace;
 
   const cardClass = `rounded-xl border bg-white`;
   const inputClass = `w-full px-4 py-2.5 rounded-lg text-sm bg-white border focus:outline-none focus:ring-2 focus:ring-orange-500/30`;
@@ -57,7 +62,7 @@ export default function Settings() {
               <h2 className="text-lg font-semibold">Profile Settings</h2>
               <div className="flex items-center gap-4">
                 <div className={`w-16 h-16 rounded-xl flex items-center justify-center text-3xl ${darkMode ? 'bg-white/10' : 'bg-gray-100'}`}>
-                  {currentUser.avatar}
+                  {currentUser?.avatar || '👤'}
                 </div>
                 <div>
                   <button className="text-sm text-orange-600 font-medium">Change avatar</button>
@@ -67,11 +72,11 @@ export default function Settings() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Full Name</label>
-                  <input type="text" defaultValue={currentUser.name} className={inputClass} />
+                  <input type="text" defaultValue={currentUser?.name || ''} className={inputClass} />
                 </div>
                 <div>
                   <label className={labelClass}>Email</label>
-                  <input type="email" defaultValue={currentUser.email} className={inputClass} />
+                  <input type="email" defaultValue={currentUser?.email || ''} className={inputClass} />
                 </div>
                 <div>
                   <label className={labelClass}>Phone</label>
@@ -94,7 +99,7 @@ export default function Settings() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Workspace Name</label>
-                  <input type="text" defaultValue={workspace.name} className={inputClass} />
+                  <input type="text" defaultValue={currentWorkspace?.name || ''} className={inputClass} />
                 </div>
                 <div>
                   <label className={labelClass}>Agency Slug</label>
@@ -102,7 +107,7 @@ export default function Settings() {
                     <span className={`px-3 py-2.5 rounded-l-lg text-sm ${darkMode ? 'bg-white/10 border-white/10 text-gray-400' : 'bg-gray-100 border-gray-200 text-gray-500'} border`}>
                       portal.clienttap.io/
                     </span>
-                    <input type="text" defaultValue={workspace.slug} className={`${inputClass} rounded-l-none`} />
+                    <input type="text" defaultValue={currentWorkspace?.slug || ''} className={`${inputClass} rounded-l-none`} />
                   </div>
                 </div>
                 <div>
@@ -133,7 +138,7 @@ export default function Settings() {
                 <div>
                   <label className={labelClass}>Logo</label>
                   <div className={`flex items-center gap-3 p-3 rounded-lg border ${darkMode ? 'border-white/10' : 'border-gray-200'}`}>
-                    <span className="text-2xl">{workspace.logo}</span>
+                    <span className="text-2xl">{currentWorkspace?.logo || '🏢'}</span>
                     <button className="text-sm text-orange-600 font-medium">Upload logo</button>
                   </div>
                 </div>
@@ -150,7 +155,7 @@ export default function Settings() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>GSTIN</label>
-                  <input type="text" defaultValue={workspace.gstin} className={inputClass} />
+                  <input type="text" defaultValue={currentWorkspace?.gstin || ''} className={inputClass} />
                 </div>
                 <div>
                   <label className={labelClass}>Business State</label>
@@ -297,7 +302,7 @@ export default function Settings() {
                 <div>
                   <label className={labelClass}>Portal Logo</label>
                   <div className={`flex items-center gap-3 p-4 rounded-lg border ${darkMode ? 'border-white/10' : 'border-gray-200'}`}>
-                    <span className="text-3xl">{workspace.logo}</span>
+                    <span className="text-3xl">{currentWorkspace?.logo || '🏢'}</span>
                     <button className="text-sm text-orange-600 font-medium">Upload logo</button>
                   </div>
                 </div>
