@@ -138,7 +138,7 @@ export default function Portal() {
                           <h4 className="font-medium">{project.name}</h4>
                           <span className="text-sm text-orange-600 font-semibold">{project.progress}%</span>
                         </div>
-                        <div className="h-2 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden mb-2">
+                        <div className="h-2 rounded-full overflow-hidden mb-2" style={{ backgroundColor: '#FAFAF8' }}>
                           <div className="h-full bg-gradient-to-r from-orange-500 to-orange-400 rounded-full" style={{ width: `${project.progress}%` }} />
                         </div>
                         <div className="flex items-center justify-between">
@@ -188,11 +188,14 @@ export default function Portal() {
                         <h3 className="font-semibold">{project.name}</h3>
                         <p className={`text-sm ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>Started {project.startDate} · Deadline {project.deadline}</p>
                       </div>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${project.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'}`}>
+                      <span className="text-xs px-2 py-0.5 rounded-full" style={{
+                        backgroundColor: project.status === 'completed' ? '#f0fdf4' : '#eff6ff',
+                        color: project.status === 'completed' ? '#166534' : '#1d4ed8'
+                      }}>
                         {project.status}
                       </span>
                     </div>
-                    <div className="h-2 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden mb-3">
+                    <div className="h-2 rounded-full overflow-hidden mb-3" style={{ backgroundColor: '#FAFAF8' }}>
                       <div className="h-full bg-orange-500 rounded-full" style={{ width: `${project.progress}%` }} />
                     </div>
                     <div className="flex items-center justify-between">
@@ -217,7 +220,10 @@ export default function Portal() {
                       </div>
                       <div className="text-right">
                         <p className="text-lg font-bold">${inv.amount.toLocaleString()}</p>
-                        <span className={`text-xs px-2 py-0.5 rounded-full ${inv.status === 'paid' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'}`}>
+                        <span className="text-xs px-2 py-0.5 rounded-full" style={{
+                          backgroundColor: inv.status === 'paid' ? '#f0fdf4' : '#fffbeb',
+                          color: inv.status === 'paid' ? '#166534' : '#92400e'
+                        }}>
                           {inv.status === 'paid' ? 'Paid' : 'Pending'}
                         </span>
                       </div>
@@ -249,7 +255,10 @@ export default function Portal() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${doc.status === 'signed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'}`}>
+                      <span className="text-xs px-2 py-0.5 rounded-full" style={{
+                        backgroundColor: doc.status === 'signed' ? '#f0fdf4' : '#eff6ff',
+                        color: doc.status === 'signed' ? '#166534' : '#1d4ed8'
+                      }}>
                         {doc.status}
                       </span>
                       <button className={`p-2 rounded-lg ${darkMode ? 'hover:bg-white/10' : 'hover:bg-gray-100'}`}>

@@ -250,11 +250,14 @@ export default function Settings() {
                     <div>
                       <div className="flex items-center gap-2">
                         <h4 className="font-medium text-sm">{integration.name}</h4>
-                        {integration.plan && <span className="text-xs bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 px-2 py-0.5 rounded-full">{integration.plan}</span>}
+                        {integration.plan && <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#fff7ed', color: '#c2410c' }}>{integration.plan}</span>}
                       </div>
                       <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>{integration.desc}</p>
                     </div>
-                    <button className={`text-xs px-3 py-1.5 rounded-lg font-medium ${integration.connected ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-orange-600 text-white'}`}>
+                    <button className="text-xs px-3 py-1.5 rounded-lg font-medium" style={{
+                      backgroundColor: integration.connected ? '#f0fdf4' : '#ea580c',
+                      color: integration.connected ? '#166534' : '#FFFFFF'
+                    }}>
                       {integration.connected ? 'Connected ✓' : 'Connect'}
                     </button>
                   </div>

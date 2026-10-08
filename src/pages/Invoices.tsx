@@ -82,17 +82,18 @@ export default function Invoices() {
   };
 
   const getStatusBadge = (status: string) => {
-    const styles: Record<string, string> = {
-      paid: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      sent: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-      overdue: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-      partially_paid: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-      draft: 'bg-gray-100 text-gray-700 dark:bg-white/10 dark:text-gray-400',
+    const styles: Record<string, { bg: string; text: string }> = {
+      paid: { bg: '#f0fdf4', text: '#166534' },
+      sent: { bg: '#eff6ff', text: '#1d4ed8' },
+      overdue: { bg: '#fef2f2', text: '#991b1b' },
+      partially_paid: { bg: '#fffbeb', text: '#92400e' },
+      draft: { bg: '#FAFAF8', text: '#78716C' },
     };
     const labels: Record<string, string> = {
       paid: 'Paid', sent: 'Sent', overdue: 'Overdue', partially_paid: 'Partial', draft: 'Draft'
     };
-    return <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${styles[status] || styles.draft}`}>{labels[status] || status}</span>;
+    const style = styles[status] || styles.draft;
+    return <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ backgroundColor: style.bg, color: style.text }}>{labels[status] || status}</span>;
   };
 
   const cardClass = `rounded-xl border bg-white`;
@@ -104,7 +105,7 @@ export default function Invoices() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold">Payments & Invoices</h1>
-          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Manage invoices, track payments, and monitor expenses</p>
+          <p className="text-sm" style={{ color: '#78716C' }}>Manage invoices, track payments, and monitor expenses</p>
         </div>
         <div className="flex gap-2">
           <button onClick={() => setShowRecordPayment(true)} className="px-4 py-2 rounded-lg text-sm font-medium border border-[#E7E5E4] transition hover:bg-stone-50">
@@ -119,19 +120,19 @@ export default function Invoices() {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className={`${cardClass} p-4 border-l-4 border-l-blue-500`}>
-          <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>Total Invoiced</p>
+          <p className="text-xs" style={{ color: '#78716C' }}>Total Invoiced</p>
           <p className="text-xl font-bold">₹{(totalInvoiced / 100000).toFixed(1)}L</p>
         </div>
         <div className={`${cardClass} p-4 border-l-4 border-l-green-500`}>
-          <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>Collected</p>
+          <p className="text-xs" style={{ color: '#78716C' }}>Collected</p>
           <p className="text-xl font-bold text-green-500">₹{(totalPaid / 100000).toFixed(1)}L</p>
         </div>
         <div className={`${cardClass} p-4 border-l-4 border-l-red-500`}>
-          <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>Overdue</p>
+          <p className="text-xs" style={{ color: '#78716C' }}>Overdue</p>
           <p className="text-xl font-bold text-red-500">₹{(totalOverdue / 1000).toFixed(0)}K</p>
         </div>
         <div className={`${cardClass} p-4 border-l-4 border-l-purple-500`}>
-          <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>Expenses</p>
+          <p className="text-xs" style={{ color: '#78716C' }}>Expenses</p>
           <p className="text-xl font-bold">₹{(totalExpenses / 100000).toFixed(1)}L</p>
         </div>
       </div>
@@ -143,7 +144,7 @@ export default function Invoices() {
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`px-4 py-3 text-sm font-medium border-b-2 transition capitalize ${
-              activeTab === tab ? 'border-orange-600 text-orange-600' : `border-transparent ${darkMode ? 'text-gray-400' : 'text-gray-500'}`
+              activeTab === tab ? 'border-orange-600 text-orange-600' : 'border-transparent text-gray-500'
             }`}
           >
             {tab}
@@ -175,7 +176,7 @@ export default function Invoices() {
                 <div key={inv.id} className={`${cardClass} p-5 hover:shadow-md transition`}>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-4">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${darkMode ? 'bg-orange-900/30' : 'bg-orange-100'}`}>
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#FFF8F2' }}>
                         <FileText className="w-5 h-5 text-orange-600" />
                       </div>
                       <div>
@@ -183,29 +184,29 @@ export default function Invoices() {
                           <h3 className="font-semibold">{inv.number}</h3>
                           {getStatusBadge(inv.status)}
                         </div>
-                        <p className={`text-sm ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>{client?.name}</p>
+                        <p className="text-sm" style={{ color: '#78716C' }}>{client?.name}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="text-right">
                         <p className="text-lg font-bold">{inv.currency === 'USD' ? '$' : '₹'}{inv.amount.toLocaleString()}</p>
-                        {inv.gst > 0 && <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>+{inv.gst}% GST</p>}
+                        {inv.gst > 0 && <p className="text-xs" style={{ color: '#78716C' }}>+{inv.gst}% GST</p>}
                       </div>
                       <div className="flex gap-1">
-                        <button className={`p-2 rounded-lg ${darkMode ? 'hover:bg-white/10' : 'hover:bg-gray-100'} transition`} title="Download PDF">
+                        <button className="p-2 rounded-lg hover:bg-stone-50 transition" title="Download PDF">
                           <Download className="w-4 h-4" />
                         </button>
-                        <button className={`p-2 rounded-lg ${darkMode ? 'hover:bg-white/10' : 'hover:bg-gray-100'} transition`} title="Send">
+                        <button className="p-2 rounded-lg hover:bg-stone-50 transition" title="Send">
                           <Send className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-4 mt-3 pt-3 border-t border-[#E7E5E4]">
-                    <span className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>Issued: {inv.issuedDate}</span>
-                    <span className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>Due: {inv.dueDate}</span>
+                    <span className="text-xs" style={{ color: '#78716C' }}>Issued: {inv.issuedDate}</span>
+                    <span className="text-xs" style={{ color: '#78716C' }}>Due: {inv.dueDate}</span>
                     {inv.type && (
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${darkMode ? 'bg-white/10 text-gray-400' : 'bg-gray-100 text-gray-600'}`}>
+                      <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#FAFAF8', color: '#78716C' }}>
                         {inv.type === 'intra-state' ? 'CGST+SGST' : 'IGST'}
                       </span>
                     )}
@@ -226,17 +227,17 @@ export default function Invoices() {
               <div key={pay.id} className={`${cardClass} p-5`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${darkMode ? 'bg-green-900/30' : 'bg-green-100'}`}>
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#f0fdf4' }}>
                       <CheckCircle2 className="w-5 h-5 text-green-600" />
                     </div>
                     <div>
                       <h3 className="font-semibold">{client?.name}</h3>
-                      <p className={`text-sm ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>{pay.method} · {pay.reference}</p>
+                      <p className="text-sm" style={{ color: '#78716C' }}>{pay.method} · {pay.reference}</p>
                     </div>
                   </div>
                   <div className="text-right">
                     <p className="text-lg font-bold text-green-500">{pay.currency === 'USD' ? '$' : '₹'}{pay.amount.toLocaleString()}</p>
-                    <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>{pay.date}</p>
+                    <p className="text-xs" style={{ color: '#78716C' }}>{pay.date}</p>
                   </div>
                 </div>
               </div>
@@ -252,12 +253,12 @@ export default function Invoices() {
             <div key={exp.id} className={`${cardClass} p-5`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${darkMode ? 'bg-red-900/30' : 'bg-red-100'}`}>
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#fef2f2' }}>
                     <TrendingDown className="w-5 h-5 text-red-600" />
                   </div>
                   <div>
                     <h3 className="font-semibold">{exp.description}</h3>
-                    <p className={`text-sm ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>{exp.category} · {exp.date}</p>
+                    <p className="text-sm" style={{ color: '#78716C' }}>{exp.category} · {exp.date}</p>
                   </div>
                 </div>
                 <p className="text-lg font-bold text-red-500">₹{exp.amount.toLocaleString()}</p>

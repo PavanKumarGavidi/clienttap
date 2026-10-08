@@ -78,7 +78,7 @@ export default function Projects() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold">Projects</h1>
-          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{store.projects.length} projects · {store.projects.filter((p: any) => p.status === 'ongoing').length} active</p>
+          <p className="text-sm" style={{ color: '#78716C' }}>{store.projects.length} projects · {store.projects.filter((p: any) => p.status === 'ongoing').length} active</p>
         </div>
         <button onClick={() => setShowAddProject(true)} className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition">
           <Plus className="w-4 h-4" /> New Project
@@ -88,15 +88,15 @@ export default function Projects() {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className={cardClass + ' p-4'}>
-          <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>Total Budget</p>
+          <p className="text-xs" style={{ color: '#78716C' }}>Total Budget</p>
           <p className="text-xl font-bold">₹{(totalBudget / 100000).toFixed(1)}L</p>
         </div>
         <div className={cardClass + ' p-4'}>
-          <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>Received</p>
+          <p className="text-xs" style={{ color: '#78716C' }}>Received</p>
           <p className="text-xl font-bold text-green-500">₹{(totalReceived / 100000).toFixed(1)}L</p>
         </div>
         <div className={cardClass + ' p-4'}>
-          <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>Pending</p>
+          <p className="text-xs" style={{ color: '#78716C' }}>Pending</p>
           <p className="text-xl font-bold text-amber-500">₹{(totalPending / 100000).toFixed(1)}L</p>
         </div>
       </div>
@@ -104,7 +104,7 @@ export default function Projects() {
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
         <div className="relative flex-1 min-w-[200px]">
-          <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#A8A29E' }} />
           <input
             type="text"
             placeholder="Search projects..."
@@ -123,10 +123,10 @@ export default function Projects() {
           <option value="completed">Completed</option>
         </select>
         <div className="flex rounded-lg overflow-hidden border border-[#E7E5E4]">
-          <button onClick={() => setViewMode('board')} className={`p-2 ${viewMode === 'board' ? 'bg-orange-600 text-white' : darkMode ? 'bg-white/5' : 'bg-white'}`}>
+          <button onClick={() => setViewMode('board')} className={`p-2 ${viewMode === 'board' ? 'bg-orange-600 text-white' : 'bg-white'}`}>
             <LayoutGrid className="w-4 h-4" />
           </button>
-          <button onClick={() => setViewMode('list')} className={`p-2 ${viewMode === 'list' ? 'bg-orange-600 text-white' : darkMode ? 'bg-white/5' : 'bg-white'}`}>
+          <button onClick={() => setViewMode('list')} className={`p-2 ${viewMode === 'list' ? 'bg-orange-600 text-white' : 'bg-white'}`}>
             <List className="w-4 h-4" />
           </button>
         </div>
@@ -141,50 +141,49 @@ export default function Projects() {
               <div key={project.id} className={`${cardClass} p-5 hover:shadow-md transition cursor-pointer`}>
                 <div className="flex items-start justify-between mb-3">
                   <div>
-                    <h3 className="font-semibold">{project.name}</h3>
-                    <p className={`text-sm ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>{client?.name}</p>
+                    <h3 className="font-semibold" style={{ color: '#1C1917' }}>{project.name}</h3>
+                    <p className="text-sm" style={{ color: '#78716C' }}>{client?.name}</p>
                   </div>
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${
-                    project.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                    project.status === 'ongoing' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
-                    'bg-gray-100 text-gray-700 dark:bg-white/10 dark:text-gray-400'
-                  }`}>
+                  <span className="text-xs px-2 py-0.5 rounded-full" style={{
+                    backgroundColor: project.status === 'completed' ? '#f0fdf4' : project.status === 'ongoing' ? '#eff6ff' : '#FAFAF8',
+                    color: project.status === 'completed' ? '#166534' : project.status === 'ongoing' ? '#1d4ed8' : '#78716C'
+                  }}>
                     {project.status}
                   </span>
                 </div>
 
                 <div className="flex items-center gap-2 mb-3">
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${darkMode ? 'bg-white/10 text-gray-400' : 'bg-gray-100 text-gray-600'}`}>
+                  <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#FAFAF8', color: '#78716C' }}>
                     {project.type === 'retainer' ? '🔄 Retainer' : '📦 One-off'}
                   </span>
                 </div>
 
                 {/* Budget */}
                 <div className="flex items-center justify-between mb-3">
-                  <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                    Budget: <span className="font-semibold">{project.currency === 'USD' ? '$' : '₹'}{project.budget.toLocaleString()}</span>
+                  <span className="text-sm" style={{ color: '#78716C' }}>
+                    Budget: <span className="font-semibold" style={{ color: '#1C1917' }}>{project.currency === 'USD' ? '$' : '₹'}{project.budget.toLocaleString()}</span>
                   </span>
                 </div>
 
                 {/* Financials */}
                 <div className="grid grid-cols-2 gap-2 mb-3">
-                  <div className={`p-2 rounded-lg ${darkMode ? 'bg-white/5' : 'bg-gray-50'}`}>
-                    <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>Received</p>
-                    <p className="text-sm font-semibold text-green-500">{project.currency === 'USD' ? '$' : '₹'}{project.received.toLocaleString()}</p>
+                  <div className="p-2 rounded-lg" style={{ backgroundColor: '#FAFAF8' }}>
+                    <p className="text-xs" style={{ color: '#78716C' }}>Received</p>
+                    <p className="text-sm font-semibold" style={{ color: '#16a34a' }}>{project.currency === 'USD' ? '$' : '₹'}{project.received.toLocaleString()}</p>
                   </div>
-                  <div className={`p-2 rounded-lg ${darkMode ? 'bg-white/5' : 'bg-gray-50'}`}>
-                    <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>Pending</p>
-                    <p className="text-sm font-semibold text-amber-500">{project.currency === 'USD' ? '$' : '₹'}{project.pending.toLocaleString()}</p>
+                  <div className="p-2 rounded-lg" style={{ backgroundColor: '#FAFAF8' }}>
+                    <p className="text-xs" style={{ color: '#78716C' }}>Pending</p>
+                    <p className="text-sm font-semibold" style={{ color: '#d97706' }}>{project.currency === 'USD' ? '$' : '₹'}{project.pending.toLocaleString()}</p>
                   </div>
                 </div>
 
                 {/* Progress */}
                 <div className="mb-3">
                   <div className="flex items-center justify-between mb-1">
-                    <span className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>Progress</span>
-                    <span className="text-xs font-medium">{project.progress}%</span>
+                    <span className="text-xs" style={{ color: '#78716C' }}>Progress</span>
+                    <span className="text-xs font-medium" style={{ color: '#1C1917' }}>{project.progress}%</span>
                   </div>
-                  <div className="h-2 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden">
+                  <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: '#FAFAF8' }}>
                     <div className="h-full bg-gradient-to-r from-orange-500 to-orange-400 rounded-full transition-all" style={{ width: `${project.progress}%` }} />
                   </div>
                 </div>
@@ -201,7 +200,7 @@ export default function Projects() {
                       );
                     })}
                   </div>
-                  <span className={`text-xs flex items-center gap-1 ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                  <span className="text-xs flex items-center gap-1" style={{ color: '#78716C' }}>
                     <Calendar className="w-3 h-3" /> {project.deadline}
                   </span>
                 </div>
@@ -230,24 +229,24 @@ export default function Projects() {
                 return (
                   <tr key={project.id} className="border-b last:border-0 border-[#E7E5E4] hover:bg-stone-50 cursor-pointer transition">
                     <td className="p-4">
-                      <p className="font-medium text-sm">{project.name}</p>
-                      <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>{project.deadline}</p>
+                      <p className="font-medium text-sm" style={{ color: '#1C1917' }}>{project.name}</p>
+                      <p className="text-xs" style={{ color: '#78716C' }}>{project.deadline}</p>
                     </td>
-                    <td className={`p-4 text-sm hidden sm:table-cell ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>{client?.name}</td>
-                    <td className="p-4 text-sm font-medium">{project.currency === 'USD' ? '$' : '₹'}{project.budget.toLocaleString()}</td>
+                    <td className="p-4 text-sm hidden sm:table-cell" style={{ color: '#78716C' }}>{client?.name}</td>
+                    <td className="p-4 text-sm font-medium" style={{ color: '#1C1917' }}>{project.currency === 'USD' ? '$' : '₹'}{project.budget.toLocaleString()}</td>
                     <td className="p-4 hidden md:table-cell">
                       <div className="flex items-center gap-2">
-                        <div className="w-20 h-2 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden">
+                        <div className="w-20 h-2 rounded-full overflow-hidden" style={{ backgroundColor: '#FAFAF8' }}>
                           <div className="h-full bg-orange-500 rounded-full" style={{ width: `${project.progress}%` }} />
                         </div>
-                        <span className="text-xs">{project.progress}%</span>
+                        <span className="text-xs" style={{ color: '#1C1917' }}>{project.progress}%</span>
                       </div>
                     </td>
                     <td className="p-4">
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${
-                        project.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                        'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-                      }`}>
+                      <span className="text-xs px-2 py-0.5 rounded-full" style={{
+                        backgroundColor: project.status === 'completed' ? '#f0fdf4' : '#eff6ff',
+                        color: project.status === 'completed' ? '#166534' : '#1d4ed8'
+                      }}>
                         {project.status}
                       </span>
                     </td>
