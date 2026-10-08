@@ -104,7 +104,7 @@ export default function Settings() {
                 <div>
                   <label className={labelClass}>Agency Slug</label>
                   <div className="flex">
-                    <span className={`px-3 py-2.5 rounded-l-lg text-sm ${darkMode ? 'bg-white/10 border-white/10 text-gray-400' : 'bg-gray-100 border-gray-200 text-gray-500'} border`}>
+                    <span className="px-3 py-2.5 rounded-l-lg text-sm bg-stone-50 border border-[#E7E5E4] text-gray-500">
                       portal.clienttap.io/
                     </span>
                     <input type="text" defaultValue={currentWorkspace?.slug || ''} className={`${inputClass} rounded-l-none`} />
@@ -137,7 +137,7 @@ export default function Settings() {
                 </div>
                 <div>
                   <label className={labelClass}>Logo</label>
-                  <div className={`flex items-center gap-3 p-3 rounded-lg border ${darkMode ? 'border-white/10' : 'border-gray-200'}`}>
+                  <div className="flex items-center gap-3 p-3 rounded-lg border border-[#E7E5E4]">
                     <span className="text-2xl">{currentWorkspace?.logo || '🏢'}</span>
                     <button className="text-sm text-orange-600 font-medium">Upload logo</button>
                   </div>
@@ -301,7 +301,7 @@ export default function Settings() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Portal Logo</label>
-                  <div className={`flex items-center gap-3 p-4 rounded-lg border ${darkMode ? 'border-white/10' : 'border-gray-200'}`}>
+                  <div className="flex items-center gap-3 p-4 rounded-lg border border-[#E7E5E4]">
                     <span className="text-3xl">{currentWorkspace?.logo || '🏢'}</span>
                     <button className="text-sm text-orange-600 font-medium">Upload logo</button>
                   </div>
@@ -320,7 +320,7 @@ export default function Settings() {
                 </div>
                 <div>
                   <label className={labelClass}>White-Label</label>
-                  <div className={`flex items-center gap-3 p-3 rounded-lg border ${darkMode ? 'border-white/10' : 'border-gray-200'}`}>
+                  <div className="flex items-center gap-3 p-3 rounded-lg border border-[#E7E5E4]">
                     <input type="checkbox" className="rounded text-orange-600" />
                     <span className="text-sm">Hide "Powered by Clienttap"</span>
                   </div>
@@ -363,7 +363,7 @@ export default function Settings() {
           {activeSection === 'danger' && (
             <div className={`${cardClass} p-6 space-y-6 border-red-500/30`}>
               <h2 className="text-lg font-semibold text-red-500">Danger Zone</h2>
-              <div className={`p-4 rounded-lg border ${darkMode ? 'border-red-900/30 bg-red-950/10' : 'border-red-100 bg-red-50'}`}>
+              <div className="p-4 rounded-lg border border-red-100 bg-red-50">
                 <h4 className="font-medium text-sm text-red-600">Delete Account</h4>
                 <p className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Permanently delete your workspace and all associated data. This cannot be undone.</p>
                 <button className="mt-3 text-xs bg-red-600 text-white px-3 py-1.5 rounded-lg font-medium">Delete Workspace</button>

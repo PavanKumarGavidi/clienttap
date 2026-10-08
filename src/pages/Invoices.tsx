@@ -107,7 +107,7 @@ export default function Invoices() {
           <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Manage invoices, track payments, and monitor expenses</p>
         </div>
         <div className="flex gap-2">
-          <button onClick={() => setShowRecordPayment(true)} className={`px-4 py-2 rounded-lg text-sm font-medium border transition ${darkMode ? 'border-white/10 hover:bg-white/5' : 'border-gray-200 hover:bg-gray-50'}`}>
+          <button onClick={() => setShowRecordPayment(true)} className="px-4 py-2 rounded-lg text-sm font-medium border border-[#E7E5E4] transition hover:bg-stone-50">
             <span className="flex items-center gap-2"><Plus className="w-4 h-4" /> Record Payment</span>
           </button>
           <button onClick={() => setShowNewInvoice(true)} className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition">
@@ -137,7 +137,7 @@ export default function Invoices() {
       </div>
 
       {/* Tabs */}
-      <div className={`flex border-b mb-6 ${darkMode ? 'border-white/10' : 'border-gray-200'}`}>
+      <div className="flex border-b border-[#E7E5E4] mb-6">
         {(['invoices', 'payments', 'expenses'] as const).map((tab) => (
           <button
             key={tab}
@@ -158,7 +158,7 @@ export default function Invoices() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className={`px-3 py-2 rounded-lg text-sm ${darkMode ? 'bg-white/5 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'} border`}
+              className="px-3 py-2 rounded-lg text-sm bg-white border border-[#E7E5E4] text-gray-900"
             >
               <option value="all">All Status</option>
               <option value="paid">Paid</option>
@@ -201,7 +201,7 @@ export default function Invoices() {
                       </div>
                     </div>
                   </div>
-                  <div className={`flex flex-wrap items-center gap-4 mt-3 pt-3 border-t ${darkMode ? 'border-white/5' : 'border-gray-100'}`}>
+                  <div className="flex flex-wrap items-center gap-4 mt-3 pt-3 border-t border-[#E7E5E4]">
                     <span className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>Issued: {inv.issuedDate}</span>
                     <span className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>Due: {inv.dueDate}</span>
                     {inv.type && (

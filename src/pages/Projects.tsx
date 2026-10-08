@@ -110,19 +110,19 @@ export default function Projects() {
             placeholder="Search projects..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className={`w-full pl-10 pr-4 py-2 rounded-lg text-sm ${darkMode ? 'bg-white/5 border-white/10 text-white placeholder:text-gray-500' : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-400'} border focus:outline-none focus:ring-2 focus:ring-orange-500/50`}
+            className="w-full pl-10 pr-4 py-2 rounded-lg text-sm bg-white border border-[#E7E5E4] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/30"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className={`px-3 py-2 rounded-lg text-sm ${darkMode ? 'bg-white/5 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'} border`}
+          className="px-3 py-2 rounded-lg text-sm bg-white border border-[#E7E5E4] text-gray-900"
         >
           <option value="all">All Status</option>
           <option value="ongoing">Ongoing</option>
           <option value="completed">Completed</option>
         </select>
-        <div className={`flex rounded-lg overflow-hidden border ${darkMode ? 'border-white/10' : 'border-gray-200'}`}>
+        <div className="flex rounded-lg overflow-hidden border border-[#E7E5E4]">
           <button onClick={() => setViewMode('board')} className={`p-2 ${viewMode === 'board' ? 'bg-orange-600 text-white' : darkMode ? 'bg-white/5' : 'bg-white'}`}>
             <LayoutGrid className="w-4 h-4" />
           </button>
@@ -190,12 +190,12 @@ export default function Projects() {
                 </div>
 
                 {/* Team & Deadline */}
-                <div className="flex items-center justify-between pt-3 border-t border-dashed border-gray-200 dark:border-white/10">
+                <div className="flex items-center justify-between pt-3 border-t border-dashed border-[#E7E5E4]">
                   <div className="flex -space-x-2">
                     {project.team.slice(0, 3).map((memberId: string) => {
                       const member = getMember(memberId);
                       return (
-                        <div key={memberId} className={`w-7 h-7 rounded-full flex items-center justify-center text-xs border-2 ${darkMode ? 'border-[#1a1a1a] bg-white/10' : 'border-white bg-gray-100'}`} title={member?.name}>
+                        <div key={memberId} className="w-7 h-7 rounded-full flex items-center justify-center text-xs border-2 border-white bg-stone-100" title={member?.name}>
                           {member?.avatar}
                         </div>
                       );
@@ -216,7 +216,7 @@ export default function Projects() {
         <div className={cardClass + ' overflow-hidden'}>
           <table className="w-full">
             <thead>
-              <tr className={`border-b ${darkMode ? 'border-white/10' : 'border-gray-100'}`}>
+              <tr className="border-b border-[#E7E5E4]">
                 <th className="text-left p-4 text-xs font-semibold text-gray-500 uppercase">Project</th>
                 <th className="text-left p-4 text-xs font-semibold text-gray-500 uppercase hidden sm:table-cell">Client</th>
                 <th className="text-left p-4 text-xs font-semibold text-gray-500 uppercase">Budget</th>
@@ -228,7 +228,7 @@ export default function Projects() {
               {filteredProjects.map((project) => {
                 const client = getClient(project.clientId);
                 return (
-                  <tr key={project.id} className={`border-b last:border-0 ${darkMode ? 'border-white/5 hover:bg-white/5' : 'border-gray-50 hover:bg-gray-50'} cursor-pointer transition`}>
+                  <tr key={project.id} className="border-b last:border-0 border-[#E7E5E4] hover:bg-stone-50 cursor-pointer transition">
                     <td className="p-4">
                       <p className="font-medium text-sm">{project.name}</p>
                       <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>{project.deadline}</p>

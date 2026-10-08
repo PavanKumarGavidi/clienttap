@@ -53,8 +53,8 @@ export default function AppLayout() {
         <div className="fixed inset-0 z-40 bg-black/40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
-      {/* Sidebar */}
-      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-64 flex flex-col bg-white border-r transition-transform lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`} style={{ borderColor: '#E7E5E4' }}>
+      {/* Sidebar - Always fixed/sticky */}
+      <aside className={`fixed inset-y-0 left-0 z-50 w-64 flex flex-col bg-white border-r transition-transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`} style={{ borderColor: '#E7E5E4' }}>
         {/* Logo + Workspace */}
         <div className="flex items-center justify-between h-16 px-4 border-b" style={{ borderColor: '#E7E5E4' }}>
           <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => navigate('/')}>
@@ -153,7 +153,7 @@ export default function AppLayout() {
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 lg:ml-64">
         {/* Top Bar */}
         <header className="sticky top-0 z-30 h-16 flex items-center justify-between px-4 lg:px-8 border-b bg-white/80 backdrop-blur-md" style={{ borderColor: '#E7E5E4' }}>
           <div className="flex items-center gap-3 flex-1">

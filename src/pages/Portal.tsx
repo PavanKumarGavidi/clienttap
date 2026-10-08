@@ -49,7 +49,7 @@ export default function Portal() {
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-[#0f0f0f] text-white' : 'bg-gray-50 text-gray-900'}`}>
       {/* Portal Header */}
-      <header className={`sticky top-0 z-50 ${darkMode ? 'bg-[#0f0f0f]/90 border-white/10' : 'bg-white/90 border-gray-200'} border-b backdrop-blur-md`}>
+      <header className="sticky top-0 z-50 bg-white/90 border-b border-[#E7E5E4] backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
           <div className="flex items-center gap-3">
             <button onClick={() => navigate('/app')} className={`p-2 rounded-lg ${darkMode ? 'hover:bg-white/10' : 'hover:bg-gray-100'} transition`}>
@@ -156,7 +156,7 @@ export default function Portal() {
                     <Bell className="w-4 h-4 text-orange-500" /> Needs Your Attention
                   </h3>
                   <div className="px-5 pb-5 space-y-3">
-                    <div className={`flex items-center gap-3 p-3 rounded-lg ${darkMode ? 'bg-orange-950/20 border border-orange-900/30' : 'bg-orange-50 border border-orange-100'}`}>
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-orange-50 border border-orange-100">
                       <Clock className="w-5 h-5 text-orange-500 shrink-0" />
                       <div className="flex-1">
                         <p className="text-sm font-medium">Invoice PC-2025-007 is due</p>
@@ -164,7 +164,7 @@ export default function Portal() {
                       </div>
                       <button className="text-xs bg-orange-600 text-white px-3 py-1.5 rounded-lg font-medium">Pay Now</button>
                     </div>
-                    <div className={`flex items-center gap-3 p-3 rounded-lg ${darkMode ? 'bg-blue-950/20 border border-blue-900/30' : 'bg-blue-50 border border-blue-100'}`}>
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-blue-50 border border-blue-100">
                       <CheckCircle className="w-5 h-5 text-blue-500 shrink-0" />
                       <div className="flex-1">
                         <p className="text-sm font-medium">Homepage mockup ready for approval</p>
@@ -225,7 +225,7 @@ export default function Portal() {
                     {inv.status !== 'paid' && (
                       <div className="mt-3 flex gap-2">
                         <button className="text-xs bg-orange-600 text-white px-3 py-1.5 rounded-lg font-medium">Pay Now</button>
-                        <button className={`text-xs px-3 py-1.5 rounded-lg font-medium border ${darkMode ? 'border-white/10' : 'border-gray-200'}`}>Download PDF</button>
+                        <button className="text-xs px-3 py-1.5 rounded-lg font-medium border border-[#E7E5E4]">Download PDF</button>
                       </div>
                     )}
                   </div>
@@ -264,7 +264,7 @@ export default function Portal() {
             {/* Messages */}
             {activeSection === 'messages' && (
               <div className={`${cardClass} animate-fade-in`}>
-                <div className={`p-4 border-b ${darkMode ? 'border-white/10' : 'border-gray-100'}`}>
+                <div className="p-4 border-b border-[#E7E5E4]">
                   <h2 className="font-semibold">Messages with {workspaceName}</h2>
                 </div>
                 <div className="p-4 space-y-4 max-h-96 overflow-y-auto">
@@ -286,7 +286,7 @@ export default function Portal() {
                     );
                   })}
                 </div>
-                <div className={`p-4 border-t ${darkMode ? 'border-white/10' : 'border-gray-100'}`}>
+                <div className="p-4 border-t border-[#E7E5E4]">
                   <div className="flex gap-2">
                     <input
                       type="text"
@@ -294,7 +294,7 @@ export default function Portal() {
                       onChange={(e) => setMessageInput(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                       placeholder="Type a message..."
-                      className={`flex-1 px-4 py-2.5 rounded-xl text-sm ${darkMode ? 'bg-white/5 border-white/10 text-white placeholder:text-gray-500' : 'bg-gray-100 border-gray-200 text-gray-900 placeholder:text-gray-400'} border focus:outline-none focus:ring-2 focus:ring-orange-500/50`}
+                      className="flex-1 px-4 py-2.5 rounded-xl text-sm bg-stone-50 border border-[#E7E5E4] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/30"
                     />
                     <button onClick={handleSendMessage} className="bg-orange-600 hover:bg-orange-700 text-white p-2.5 rounded-xl transition">
                       <Send className="w-5 h-5" />
@@ -323,7 +323,7 @@ export default function Portal() {
                   </div>
                   <textarea
                     placeholder="Share your experience..."
-                    className={`w-full p-3 rounded-xl text-sm resize-none h-24 ${darkMode ? 'bg-white/5 border-white/10 text-white placeholder:text-gray-500' : 'bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400'} border focus:outline-none focus:ring-2 focus:ring-orange-500/50`}
+                    className="w-full p-3 rounded-xl text-sm resize-none h-24 bg-stone-50 border border-[#E7E5E4] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/30"
                   />
                   <button className="mt-3 bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
                     Submit Review
