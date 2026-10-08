@@ -56,6 +56,7 @@ interface Store {
   markMessageRead: (id: string) => void;
   
   addMeeting: (meeting: Omit<Meeting, 'id'>) => void;
+  addDocument: (doc: Omit<Document, 'id'>) => void;
   
   addNotification: (n: Omit<Notification, 'id'>) => void;
   markNotificationRead: (id: string) => void;
@@ -169,6 +170,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setMeetings(prev => [...prev, { ...meeting, id: genId('m') } as Meeting]);
   };
   
+  const addDocument = (doc: Omit<Document, 'id'>) => {
+    setDocuments(prev => [...prev, { ...doc, id: genId('d') } as Document]);
+  };
+  
   const addNotification = (n: Omit<Notification, 'id'>) => {
     setNotifications(prev => [{ ...n, id: genId('n') } as Notification, ...prev]);
   };
@@ -187,7 +192,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       addLead, updateLead, deleteLead, moveLeadToStage, convertLeadToClient,
       addClient, updateClient, addProject, updateProject,
       addInvoice, addPayment, addTask, updateTask,
-      addMessage, markMessageRead, addMeeting,
+      addMessage, markMessageRead, addMeeting, addDocument,
       addNotification, markNotificationRead, markAllNotificationsRead,
     }}>
       {children}
