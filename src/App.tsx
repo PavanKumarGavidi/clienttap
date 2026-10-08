@@ -2,6 +2,7 @@ import { useState, useEffect, createContext, useContext } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import MarketingSite from './components/Marketing';
 import AppLayout from './components/AppLayout';
+import AuthPages from './components/AuthPages';
 import Dashboard from './pages/Dashboard';
 import Leads from './pages/Leads';
 import Clients from './pages/Clients';
@@ -49,6 +50,14 @@ export default function App() {
           <Route path="/security" element={<MarketingSite />} />
           <Route path="/demo" element={<MarketingSite />} />
           
+          {/* Auth Pages */}
+          <Route path="/signup" element={<AuthPages />} />
+          <Route path="/login" element={<AuthPages />} />
+          <Route path="/forgot-password" element={<AuthPages />} />
+          <Route path="/reset-password" element={<AuthPages />} />
+          <Route path="/accept-invite" element={<AuthPages />} />
+          <Route path="/portal/:slug/login" element={<AuthPages />} />
+
           {/* App Routes */}
           <Route path="/app" element={<AppLayout />}>
             <Route index element={<Dashboard />} />
