@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useApp } from '../App';
-import { workspace, currentUser, notifications } from '../data/mockData';
+import { useStore } from '../store/StoreContext';
+import { workspace, currentUser } from '../data/mockData';
 import {
   LayoutDashboard, Users, UserCircle, FolderKanban, CreditCard,
   MessageSquare, Calendar, CheckSquare, FileText, UserCog,
@@ -31,11 +32,13 @@ const bottomItems = [
 
 export default function AppLayout() {
   const { darkMode, toggleDarkMode } = useApp();
+  const store = useStore();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
 
+  const { notifications, markNotificationRead, markAllNotificationsRead } = store;
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
@@ -183,9 +186,22 @@ export default function AppLayout() {
                   <div className="p-4 border-b" style={{ borderColor: '#E7E5E4' }}>
                     <h3 className="font-semibold text-sm" style={{ color: '#1C1917' }}>Notifications</h3>
                   </div>
+                  <div className="p-3 border-b flex items-center justify-between" style={{ borderColor: '#E7E5E4' }}>
+                    <span className="text-xs font-medium" style={{ color: '#78716C' }}>{unreadCount} unread</span>
+                    {unreadCount > 0 && (
+                      <button onClick={markAllNotificationsRead} className="text-xs font-medium hover:underline" style={{ color: '#ea580c' }}>
+                        Mark all as read
+                      </button>
+                    )}
+                  </div>
                   <div className="max-h-80 overflow-y-auto">
                     {notifications.map((n) => (
-                      <div key={n.id} className={`px-4 py-3 border-b last:border-0 ${!n.read ? 'bg-orange-50/50' : ''}`} style={{ borderColor: '#E7E5E4' }}>
+                      <div 
+                        key={n.id} 
+                        onClick={() => markNotificationRead(n.id)}
+                        className={`px-4 py-3 border-b last:border-0 cursor-pointer transition hover:bg-stone-50 ${!n.read ? 'bg-orange-50/50' : ''}`} 
+                        style={{ borderColor: '#E7E5E4' }}
+                      >
                         <p className="text-sm font-medium" style={{ color: '#1C1917' }}>{n.title}</p>
                         <p className="text-xs" style={{ color: '#78716C' }}>{n.message}</p>
                         <p className="text-xs mt-1" style={{ color: '#A8A29E' }}>{n.time}</p>

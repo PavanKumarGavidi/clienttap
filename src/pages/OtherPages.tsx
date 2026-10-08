@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '../App';
-import { messages, meetings, tasks, documents, teamMembers, workspace } from '../data/mockData';
+import { useStore } from '../store/StoreContext';
+import { teamMembers, workspace } from '../data/mockData';
 import {
   MessageSquare, Send, Calendar, Clock, CheckSquare, FileText,
   CreditCard, Plus, Search, Filter, Star, CheckCircle2,
@@ -30,9 +31,25 @@ export default function OtherPages({ page }: Props) {
 
 function MessagesPage() {
   const { darkMode } = useApp();
+  const store = useStore();
   const [selectedThread, setSelectedThread] = useState('th1');
   const [messageInput, setMessageInput] = useState('');
   const cardClass = `rounded-xl border ${darkMode ? 'bg-[#1a1a1a] border-white/10' : 'bg-white border-gray-200'}`;
+
+  const threadMessages = store.messages.filter(m => m.threadId === selectedThread);
+
+  const handleSendMessage = () => {
+    if (!messageInput.trim()) return;
+    store.addMessage({
+      threadId: selectedThread,
+      clientId: 'c1',
+      sender: 'u_001',
+      content: messageInput,
+      timestamp: new Date().toISOString(),
+      read: true,
+    });
+    setMessageInput('');
+  };
 
   const threads = [
     { id: 'th1', client: 'GreenLeaf Organics', lastMessage: 'Looks great! Just a few notes on the hero section.', time: '3:45 PM', unread: 0 },
@@ -41,8 +58,6 @@ function MessagesPage() {
     { id: 'th4', client: 'Saffron Kitchen', lastMessage: 'Can we move the menu section up?', time: 'Yesterday', unread: 0 },
     { id: 'th5', client: 'FitLife Gym', lastMessage: 'The portal access is working perfectly!', time: '2 days ago', unread: 0 },
   ];
-
-  const threadMessages = messages.filter(m => m.threadId === selectedThread);
 
   return (
     <div className="h-full flex flex-col lg:flex-row animate-fade-in">
@@ -125,6 +140,7 @@ function MessagesPage() {
 
 function MeetingsPage() {
   const { darkMode } = useApp();
+  const store = useStore();
   const cardClass = `rounded-xl border ${darkMode ? 'bg-[#1a1a1a] border-white/10' : 'bg-white border-gray-200'}`;
 
   return (
@@ -140,7 +156,7 @@ function MeetingsPage() {
       </div>
 
       <div className="space-y-4">
-        {meetings.map((meeting) => (
+        {store.meetings.map((meeting: any) => (
           <div key={meeting.id} className={`${cardClass} p-5`}>
             <div className="flex items-start justify-between">
               <div className="flex items-start gap-4">
@@ -168,7 +184,7 @@ function MeetingsPage() {
             </div>
             <div className={`flex items-center gap-2 mt-3 pt-3 border-t ${darkMode ? 'border-white/5' : 'border-gray-100'}`}>
               <span className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>Attendees:</span>
-              {meeting.attendees.map((id) => {
+              {meeting.attendees.map((id: string) => {
                 const member = teamMembers.find(m => m.id === id);
                 return member ? (
                   <span key={id} className="text-sm" title={member.name}>{member.avatar}</span>
@@ -185,6 +201,7 @@ function MeetingsPage() {
 
 function TasksPage() {
   const { darkMode } = useApp();
+  const store = useStore();
   const [viewMode, setViewMode] = useState<'list' | 'board'>('list');
   const cardClass = `rounded-xl border ${darkMode ? 'bg-[#1a1a1a] border-white/10' : 'bg-white border-gray-200'}`;
 
@@ -207,7 +224,7 @@ function TasksPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">Tasks</h1>
-          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{tasks.length} tasks · {tasks.filter(t => t.status === 'done').length} completed</p>
+          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{store.tasks.length} tasks · {store.tasks.filter((t: any) => t.status === 'done').length} completed</p>
         </div>
         <div className="flex items-center gap-2">
           <div className={`flex rounded-lg overflow-hidden border ${darkMode ? 'border-white/10' : 'border-gray-200'}`}>
@@ -237,7 +254,7 @@ function TasksPage() {
               </tr>
             </thead>
             <tbody>
-              {tasks.map((task) => {
+              {store.tasks.map((task: any) => {
                 const member = getMember(task.assignee);
                 return (
                   <tr key={task.id} className={`border-b last:border-0 ${darkMode ? 'border-white/5 hover:bg-white/5' : 'border-gray-50 hover:bg-gray-50'} transition`}>
@@ -270,7 +287,7 @@ function TasksPage() {
       {viewMode === 'board' && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {(['todo', 'in-progress', 'done'] as const).map((status) => {
-            const statusTasks = tasks.filter(t => t.status === status);
+            const statusTasks = store.tasks.filter((t: any) => t.status === status);
             return (
               <div key={status}>
                 <h3 className="text-sm font-semibold mb-3 flex items-center gap-2 capitalize">
@@ -301,6 +318,7 @@ function TasksPage() {
 
 function DocumentsPage() {
   const { darkMode } = useApp();
+  const store = useStore();
   const cardClass = `rounded-xl border ${darkMode ? 'bg-[#1a1a1a] border-white/10' : 'bg-white border-gray-200'}`;
 
   return (
@@ -350,7 +368,7 @@ function DocumentsPage() {
       {/* Documents List */}
       <h3 className="font-semibold mb-3">Recent Documents</h3>
       <div className="space-y-3">
-        {documents.map((doc) => (
+        {store.documents.map((doc: any) => (
           <div key={doc.id} className={`${cardClass} p-4 flex items-center justify-between`}>
             <div className="flex items-center gap-3">
               <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${darkMode ? 'bg-orange-900/30' : 'bg-orange-100'}`}>

@@ -1,32 +1,88 @@
+import { useState } from 'react';
 import { useApp } from '../App';
-import { currentUser, projects, clients, retainers, revenueData, revenueByType, leadsBySource, meetings, payments, leads } from '../data/mockData';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area, CartesianGrid } from 'recharts';
-import { TrendingUp, Users, FolderOpen, Clock, Plus, Calendar, ArrowRight, ExternalLink, Repeat } from 'lucide-react';
+import { useStore } from '../store/StoreContext';
+import { currentUser, revenueData, revenueByType, leadsBySource } from '../data/mockData';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, CartesianGrid } from 'recharts';
+import { TrendingUp, Users, FolderOpen, Clock, Plus, Calendar, ArrowRight, Repeat, X } from 'lucide-react';
 
 export default function Dashboard() {
   const { darkMode } = useApp();
+  const store = useStore();
+  const [showAddClient, setShowAddClient] = useState(false);
+  const [showScheduleMeeting, setShowScheduleMeeting] = useState(false);
+  const [newClientName, setNewClientName] = useState('');
+  const [newClientEmail, setNewClientEmail] = useState('');
+  const [meetingTitle, setMeetingTitle] = useState('');
+  const [meetingDate, setMeetingDate] = useState('');
+  const [meetingTime, setMeetingTime] = useState('');
+
+  const { leads, projects, clients, retainers, payments, meetings } = store;
 
   const openLeads = leads.filter(l => !['s5', 's6'].includes(l.stage)).length;
-  const pipelineValue = leads.filter(l => !['s5', 's6'].includes(l.stage)).reduce((s, l) => s + l.value, 0);
+  const pipelineValue = leads.filter(l => !['s5', 's6'].includes(l.stage)).reduce((s: number, l: any) => s + l.value, 0);
   const wonThisMonth = leads.filter(l => l.stage === 's5').length;
   const winRate = 68;
   const ongoingProjects = projects.filter(p => p.status === 'ongoing').length;
   const completedProjects = projects.filter(p => p.status === 'completed').length;
   const newProjects = projects.filter(p => p.progress < 30 && p.status === 'ongoing').length;
   const activeRetainers = retainers.filter(r => r.status === 'active').length;
-  const mrr = retainers.filter(r => r.status === 'active').reduce((sum, r) => sum + (r.currency === 'USD' ? r.amount * 83 : r.amount), 0);
+  const mrr = retainers.filter(r => r.status === 'active').reduce((sum: number, r: any) => sum + (r.currency === 'USD' ? r.amount * 83 : r.amount), 0);
 
-  const totalRevenue = projects.reduce((sum, p) => sum + (p.currency === 'USD' ? p.budget * 83 : p.budget), 0);
-  const totalReceived = payments.reduce((sum, p) => sum + (p.currency === 'USD' ? p.amount * 83 : p.amount), 0);
+  const totalRevenue = projects.reduce((sum: number, p: any) => sum + (p.currency === 'USD' ? p.budget * 83 : p.budget), 0);
+  const totalReceived = payments.reduce((sum: number, p: any) => sum + (p.currency === 'USD' ? p.amount * 83 : p.amount), 0);
   const totalPending = totalRevenue - totalReceived;
   const totalExpenses = 256500;
   const moneyInAccount = totalReceived - totalExpenses;
-  const collectedPct = Math.round((totalReceived / totalRevenue) * 100);
+  const collectedPct = totalRevenue > 0 ? Math.round((totalReceived / totalRevenue) * 100) : 0;
 
-  const thisMonthRevenue = projects.reduce((s, p) => s + (p.currency === 'USD' ? p.budget * 83 : p.budget), 0);
+  const thisMonthRevenue = projects.reduce((s: number, p: any) => s + (p.currency === 'USD' ? p.budget * 83 : p.budget), 0);
   const thisMonthReceived = totalReceived;
 
   const upcomingMeetings = meetings.filter(m => m.status === 'upcoming').slice(0, 4);
+
+  const handleAddClient = () => {
+    if (!newClientName) return;
+    store.addClient({
+      name: newClientName,
+      company: newClientName,
+      email: newClientEmail,
+      phone: '',
+      address: '',
+      gstin: '',
+      currency: 'INR',
+      currencySymbol: '₹',
+      owner: 'u_001',
+      portalEnabled: false,
+      totalProjects: 0,
+      totalInvoiced: 0,
+      totalPaid: 0,
+      outstanding: 0,
+      since: new Date().toISOString().split('T')[0],
+    });
+    store.addNotification({ type: 'payment', title: 'New client added', message: `${newClientName} has been added`, time: 'Just now', read: false });
+    setNewClientName('');
+    setNewClientEmail('');
+    setShowAddClient(false);
+  };
+
+  const handleScheduleMeeting = () => {
+    if (!meetingTitle || !meetingDate) return;
+    store.addMeeting({
+      title: meetingTitle,
+      clientId: 'c1',
+      date: meetingDate,
+      time: meetingTime || '10:00',
+      duration: 30,
+      attendees: ['u_001'],
+      status: 'upcoming',
+      notes: '',
+    });
+    store.addNotification({ type: 'meeting', title: 'Meeting scheduled', message: meetingTitle, time: 'Just now', read: false });
+    setMeetingTitle('');
+    setMeetingDate('');
+    setMeetingTime('');
+    setShowScheduleMeeting(false);
+  };
 
   const card = "bg-white rounded-2xl border p-5";
   const cardBorder = { borderColor: '#E7E5E4' };
@@ -295,7 +351,7 @@ export default function Dashboard() {
 
         {/* Quick actions */}
         <div className="grid grid-cols-2 gap-3">
-          <button className="bg-white rounded-2xl border p-5 flex flex-col items-start justify-between h-full hover:shadow-md transition group" style={cardBorder}>
+          <button onClick={() => setShowAddClient(true)} className="bg-white rounded-2xl border p-5 flex flex-col items-start justify-between h-full hover:shadow-md transition group" style={cardBorder}>
             <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition" style={{ backgroundColor: '#fff7ed' }}>
               <Plus className="w-5 h-5" style={{ color: '#ea580c' }} />
             </div>
@@ -304,7 +360,7 @@ export default function Dashboard() {
               <p className="text-xs mt-0.5" style={inkFaint}>New client profile</p>
             </div>
           </button>
-          <button className="bg-white rounded-2xl border p-5 flex flex-col items-start justify-between h-full hover:shadow-md transition group" style={cardBorder}>
+          <button onClick={() => setShowScheduleMeeting(true)} className="bg-white rounded-2xl border p-5 flex flex-col items-start justify-between h-full hover:shadow-md transition group" style={cardBorder}>
             <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition" style={{ backgroundColor: '#fff7ed' }}>
               <Calendar className="w-5 h-5" style={{ color: '#ea580c' }} />
             </div>
@@ -315,6 +371,104 @@ export default function Dashboard() {
           </button>
         </div>
       </div>
+
+      {/* Add Client Modal */}
+      {showAddClient && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowAddClient(false)}>
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Add New Client</h3>
+              <button onClick={() => setShowAddClient(false)} className="p-1 hover:bg-stone-100 rounded">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Client Name *</label>
+                <input
+                  type="text"
+                  value={newClientName}
+                  onChange={(e) => setNewClientName(e.target.value)}
+                  placeholder="Enter client name"
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Email</label>
+                <input
+                  type="email"
+                  value={newClientEmail}
+                  onChange={(e) => setNewClientEmail(e.target.value)}
+                  placeholder="client@example.com"
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button onClick={() => setShowAddClient(false)} className="flex-1 px-4 py-2 border rounded-lg hover:bg-stone-50">
+                Cancel
+              </button>
+              <button onClick={handleAddClient} disabled={!newClientName.trim()} className="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                Add Client
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Schedule Meeting Modal */}
+      {showScheduleMeeting && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowScheduleMeeting(false)}>
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Schedule Meeting</h3>
+              <button onClick={() => setShowScheduleMeeting(false)} className="p-1 hover:bg-stone-100 rounded">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Meeting Title *</label>
+                <input
+                  type="text"
+                  value={meetingTitle}
+                  onChange={(e) => setMeetingTitle(e.target.value)}
+                  placeholder="e.g., Project kickoff"
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Date *</label>
+                <input
+                  type="date"
+                  value={meetingDate}
+                  onChange={(e) => setMeetingDate(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Time</label>
+                <input
+                  type="time"
+                  value={meetingTime}
+                  onChange={(e) => setMeetingTime(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button onClick={() => setShowScheduleMeeting(false)} className="flex-1 px-4 py-2 border rounded-lg hover:bg-stone-50">
+                Cancel
+              </button>
+              <button onClick={handleScheduleMeeting} disabled={!meetingTitle.trim() || !meetingDate} className="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                Schedule
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../App';
-import { workspace, projects, invoices, messages, documents, reviews } from '../data/mockData';
+import { useStore } from '../store/StoreContext';
+import { workspace, projects, invoices, documents, reviews } from '../data/mockData';
 import { Zap, FolderOpen, FileText, CreditCard, MessageSquare, Star, MessageCircle, Send, CheckCircle, Clock, Download, ArrowLeft, Bell, User, LogOut } from 'lucide-react';
 
 export default function Portal() {
@@ -10,13 +11,15 @@ export default function Portal() {
   const [activeSection, setActiveSection] = useState('dashboard');
   const [messageInput, setMessageInput] = useState('');
 
+  const store = useStore();
+  
   // Simulating a logged-in client view
   const clientName = 'GreenLeaf Organics';
   const clientProjects = projects.filter(p => p.clientId === 'c1');
   const clientInvoices = invoices.filter(i => i.clientId === 'c1');
-  const clientMessages = messages.filter(m => m.clientId === 'c1');
+  const clientMessages = store.messages.filter(m => m.clientId === 'c1');
   const clientDocs = documents.filter(d => d.clientId === 'c1');
-  const totalOwed = clientInvoices.filter(i => i.status !== 'paid').reduce((s, i) => s + i.amount, 0);
+  const totalOwed = clientInvoices.filter(i => i.status !== 'paid').reduce((s: number, i: any) => s + i.amount, 0);
 
   const cardClass = `rounded-xl border bg-white`;
 
@@ -28,6 +31,19 @@ export default function Portal() {
     { id: 'messages', label: 'Messages', icon: MessageSquare },
     { id: 'reviews', label: 'Reviews', icon: Star },
   ];
+
+  const handleSendMessage = () => {
+    if (!messageInput.trim()) return;
+    store.addMessage({
+      threadId: 'th1',
+      clientId: 'c1',
+      sender: 'c1',
+      content: messageInput,
+      timestamp: new Date().toISOString(),
+      read: true,
+    });
+    setMessageInput('');
+  };
 
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-[#0f0f0f] text-white' : 'bg-gray-50 text-gray-900'}`}>
@@ -275,10 +291,11 @@ export default function Portal() {
                       type="text"
                       value={messageInput}
                       onChange={(e) => setMessageInput(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                       placeholder="Type a message..."
                       className={`flex-1 px-4 py-2.5 rounded-xl text-sm ${darkMode ? 'bg-white/5 border-white/10 text-white placeholder:text-gray-500' : 'bg-gray-100 border-gray-200 text-gray-900 placeholder:text-gray-400'} border focus:outline-none focus:ring-2 focus:ring-orange-500/50`}
                     />
-                    <button className="bg-orange-600 hover:bg-orange-700 text-white p-2.5 rounded-xl transition">
+                    <button onClick={handleSendMessage} className="bg-orange-600 hover:bg-orange-700 text-white p-2.5 rounded-xl transition">
                       <Send className="w-5 h-5" />
                     </button>
                   </div>

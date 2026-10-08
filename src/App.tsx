@@ -1,5 +1,6 @@
 import { useState, useEffect, createContext, useContext } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { StoreProvider } from './store/StoreContext';
 import MarketingSite from './components/Marketing';
 import AppLayout from './components/AppLayout';
 import AuthPages from './components/AuthPages';
@@ -31,6 +32,7 @@ export default function App() {
 
   return (
     <AppContext.Provider value={{ darkMode, toggleDarkMode }}>
+      <StoreProvider>
       <Router>
         <Routes>
           {/* Marketing Site */}
@@ -70,6 +72,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
+      </StoreProvider>
     </AppContext.Provider>
   );
 }

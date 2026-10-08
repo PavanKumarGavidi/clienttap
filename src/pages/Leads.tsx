@@ -1,29 +1,136 @@
 import { useState } from 'react';
-import { useApp } from '../App';
-import { leads, pipelineStages, teamMembers } from '../data/mockData';
-import { Plus, Search, Download, Upload, Phone, Mail, Building2, Clock, ArrowRight, X, Tag } from 'lucide-react';
+import { useStore } from '../store/StoreContext';
+import { pipelineStages, teamMembers } from '../data/mockData';
+import { DndContext, DragEndEvent, useDraggable, useDroppable } from '@dnd-kit/core';
+import { Plus, Search, Download, Upload, Phone, Mail, Building2, Clock, ArrowRight, X, Tag, Filter } from 'lucide-react';
+
+function DraggableLead({ lead, onClick }: { lead: any; onClick: () => void }) {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: lead.id,
+  });
+  const style = transform ? {
+    transform: `translate(${transform.x}px, ${transform.y}px)`,
+  } : undefined;
+
+  const assignee = teamMembers.find(m => m.id === lead.assignedTo);
+
+  return (
+    <div
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      onClick={onClick}
+      className="p-3 rounded-xl bg-white border cursor-pointer transition hover:shadow-md kanban-card"
+      style={{ borderColor: '#E7E5E4', ...style }}
+    >
+      <div className="flex items-start justify-between mb-2">
+        <div>
+          <p className="text-sm font-medium" style={{ color: '#1C1917' }}>{lead.name}</p>
+          <p className="text-xs flex items-center gap-1" style={{ color: '#78716C' }}>
+            <Building2 className="w-3 h-3" /> {lead.company}
+          </p>
+        </div>
+        {lead.followUp && <Clock className="w-4 h-4" style={{ color: '#d97706' }} />}
+      </div>
+      <div className="flex items-center justify-between mt-3">
+        <span className="text-sm font-semibold" style={{ color: '#ea580c' }}>
+          {lead.currency === 'USD' ? `$${lead.value.toLocaleString()}` : `₹${(lead.value / 1000).toFixed(0)}K`}
+        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#FAFAF8', color: '#78716C' }}>
+            {lead.source}
+          </span>
+          {assignee && <span className="text-sm">{assignee.avatar}</span>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DroppableColumn({ id, children }: { id: string; children: React.ReactNode }) {
+  const { setNodeRef, isOver } = useDroppable({ id });
+  
+  return (
+    <div
+      ref={setNodeRef}
+      className={`space-y-2 p-2 rounded-xl min-h-[400px] transition-colors ${isOver ? 'bg-orange-50' : ''}`}
+      style={{ backgroundColor: isOver ? '#fff7ed' : '#FAEFE2' }}
+    >
+      {children}
+    </div>
+  );
+}
 
 export default function Leads() {
-  const { darkMode } = useApp();
+  const store = useStore();
   const [selectedLead, setSelectedLead] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterSource, setFilterSource] = useState('all');
+  const [showAddLead, setShowAddLead] = useState(false);
+  const [newLead, setNewLead] = useState({
+    name: '',
+    company: '',
+    email: '',
+    phone: '',
+    value: 0,
+    currency: 'INR',
+    source: 'Website',
+    assignedTo: 'u_001',
+  });
 
-  const filteredLeads = leads.filter(l => {
-    const matchesSearch = l.name.toLowerCase().includes(searchQuery.toLowerCase()) || l.company.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredLeads = store.leads.filter(l => {
+    const matchesSearch = l.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                         l.company.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesSource = filterSource === 'all' || l.source === filterSource;
     return matchesSearch && matchesSource;
   });
 
   const getLeadsByStage = (stageId: string) => filteredLeads.filter(l => l.stage === stageId);
-  const getTeamMember = (id: string) => teamMembers.find(m => m.id === id);
   
-  const openLeads = leads.filter(l => !['s5', 's6'].includes(l.stage)).length;
-  const pipelineValue = leads.filter(l => !['s5', 's6'].includes(l.stage)).reduce((s, l) => s + l.value, 0);
-  const wonThisMonth = leads.filter(l => l.stage === 's5').length;
-  const winRate = Math.round((wonThisMonth / (wonThisMonth + leads.filter(l => l.stage === 's6').length)) * 100);
+  const openLeads = store.leads.filter(l => !['s5', 's6'].includes(l.stage)).length;
+  const pipelineValue = store.leads.filter(l => !['s5', 's6'].includes(l.stage)).reduce((s: number, l: any) => s + l.value, 0);
+  const wonThisMonth = store.leads.filter(l => l.stage === 's5').length;
+  const winRate = Math.round((wonThisMonth / (wonThisMonth + store.leads.filter(l => l.stage === 's6').length || 1)) * 100);
 
-  const selectedLeadData = leads.find(l => l.id === selectedLead);
+  const selectedLeadData = store.leads.find(l => l.id === selectedLead);
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      store.moveLeadToStage(active.id as string, over.id as string);
+    }
+  };
+
+  const handleAddLead = () => {
+    if (!newLead.name || !newLead.company) return;
+    store.addLead({
+      ...newLead,
+      stage: 's1',
+      createdAt: new Date().toISOString().split('T')[0],
+      followUp: false,
+    });
+    store.addNotification({
+      type: 'payment',
+      title: 'New lead added',
+      message: `${newLead.name} from ${newLead.company}`,
+      time: 'Just now',
+      read: false,
+    });
+    setNewLead({ name: '', company: '', email: '', phone: '', value: 0, currency: 'INR', source: 'Website', assignedTo: 'u_001' });
+    setShowAddLead(false);
+  };
+
+  const handleConvertToClient = (leadId: string) => {
+    store.convertLeadToClient(leadId);
+    store.addNotification({
+      type: 'payment',
+      title: 'Lead converted to client',
+      message: 'New client created successfully',
+      time: 'Just now',
+      read: false,
+    });
+    setSelectedLead(null);
+  };
 
   return (
     <div className="h-full flex flex-col animate-fade-in" style={{ backgroundColor: '#FAFAF8' }}>
@@ -34,7 +141,7 @@ export default function Leads() {
             <h1 className="text-2xl font-bold tracking-tight" style={{ color: '#1C1917' }}>Leads Pipeline</h1>
             <p className="text-sm mt-0.5" style={{ color: '#78716C' }}>Manage your sales pipeline and convert leads to clients</p>
           </div>
-          <button className="btn-primary text-sm flex items-center gap-2 !py-2">
+          <button onClick={() => setShowAddLead(true)} className="btn-primary text-sm flex items-center gap-2 !py-2">
             <Plus className="w-4 h-4" /> Add Lead
           </button>
         </div>
@@ -78,69 +185,41 @@ export default function Leads() {
             <option value="Website">Website</option>
             <option value="Referral">Referral</option>
             <option value="Ads">Ads</option>
+            <option value="Cold Call">Cold Call</option>
           </select>
-          <button className="p-2 rounded-lg bg-white border hover:bg-stone-50 transition" style={{ borderColor: '#E7E5E4' }}>
-            <Upload className="w-4 h-4" style={{ color: '#78716C' }} />
-          </button>
-          <button className="p-2 rounded-lg bg-white border hover:bg-stone-50 transition" style={{ borderColor: '#E7E5E4' }}>
-            <Download className="w-4 h-4" style={{ color: '#78716C' }} />
-          </button>
         </div>
       </div>
 
       {/* Kanban Board */}
-      <div className="flex-1 overflow-x-auto px-4 lg:px-8 pb-6">
-        <div className="flex gap-4 min-w-max">
-          {pipelineStages.filter(s => s.id !== 's6').map((stage) => {
-            const stageLeads = getLeadsByStage(stage.id);
-            return (
-              <div key={stage.id} className="w-72 flex-shrink-0">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: stage.color }} />
-                    <h3 className="text-sm font-semibold" style={{ color: '#1C1917' }}>{stage.name}</h3>
-                    <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ backgroundColor: '#FAFAF8', color: '#78716C' }}>{stageLeads.length}</span>
+      <DndContext onDragEnd={handleDragEnd}>
+        <div className="flex-1 overflow-x-auto px-4 lg:px-8 pb-6">
+          <div className="flex gap-4 min-w-max">
+            {pipelineStages.filter(s => s.id !== 's6').map((stage) => {
+              const stageLeads = getLeadsByStage(stage.id);
+              return (
+                <div key={stage.id} className="w-72 flex-shrink-0">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: stage.color }} />
+                      <h3 className="text-sm font-semibold" style={{ color: '#1C1917' }}>{stage.name}</h3>
+                      <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ backgroundColor: '#FAFAF8', color: '#78716C' }}>{stageLeads.length}</span>
+                    </div>
                   </div>
-                </div>
-                <div className="space-y-2 p-2 rounded-xl min-h-[400px]" style={{ backgroundColor: '#FAEFE2' }}>
-                  {stageLeads.map((lead) => {
-                    const assignee = getTeamMember(lead.assignedTo);
-                    return (
-                      <div
+                  <DroppableColumn id={stage.id}>
+                    {stageLeads.map((lead) => (
+                      <DraggableLead
                         key={lead.id}
+                        lead={lead}
                         onClick={() => setSelectedLead(lead.id)}
-                        className="p-3 rounded-xl bg-white border cursor-pointer transition hover:shadow-md kanban-card"
-                        style={{ borderColor: '#E7E5E4' }}
-                      >
-                        <div className="flex items-start justify-between mb-2">
-                          <div>
-                            <p className="text-sm font-medium" style={{ color: '#1C1917' }}>{lead.name}</p>
-                            <p className="text-xs flex items-center gap-1" style={{ color: '#78716C' }}>
-                              <Building2 className="w-3 h-3" /> {lead.company}
-                            </p>
-                          </div>
-                          {lead.followUp && <Clock className="w-4 h-4" style={{ color: '#d97706' }} />}
-                        </div>
-                        <div className="flex items-center justify-between mt-3">
-                          <span className="text-sm font-semibold" style={{ color: '#ea580c' }}>
-                            {lead.currency === 'USD' ? `$${lead.value.toLocaleString()}` : `₹${(lead.value / 1000).toFixed(0)}K`}
-                          </span>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#FAFAF8', color: '#78716C' }}>
-                              {lead.source}
-                            </span>
-                            {assignee && <span className="text-sm">{assignee.avatar}</span>}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
+                      />
+                    ))}
+                  </DroppableColumn>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-      </div>
+      </DndContext>
 
       {/* Lead Detail Drawer */}
       {selectedLeadData && (
@@ -192,7 +271,7 @@ export default function Leads() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm" style={{ color: '#78716C' }}>Assigned to</span>
-                    <span className="text-sm font-medium" style={{ color: '#1C1917' }}>{getTeamMember(selectedLeadData.assignedTo)?.name}</span>
+                    <span className="text-sm font-medium" style={{ color: '#1C1917' }}>{teamMembers.find(m => m.id === selectedLeadData.assignedTo)?.name}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm" style={{ color: '#78716C' }}>Created</span>
@@ -202,13 +281,129 @@ export default function Leads() {
               </div>
 
               <div className="space-y-2 pt-4">
-                <button className="w-full btn-primary text-sm flex items-center justify-center gap-2">
+                <button 
+                  onClick={() => handleConvertToClient(selectedLeadData.id)}
+                  className="w-full btn-primary text-sm flex items-center justify-center gap-2"
+                >
                   <ArrowRight className="w-4 h-4" /> Convert to Client
                 </button>
-                <button className="w-full py-2.5 rounded-xl text-sm font-medium border transition hover:bg-stone-50" style={{ borderColor: '#E7E5E4', color: '#1C1917' }}>
+                <button 
+                  onClick={() => {
+                    store.updateLead(selectedLeadData.id, { stage: 's6' });
+                    setSelectedLead(null);
+                  }}
+                  className="w-full py-2.5 rounded-xl text-sm font-medium border transition hover:bg-stone-50" 
+                  style={{ borderColor: '#E7E5E4', color: '#1C1917' }}
+                >
                   Mark as Lost
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Lead Modal */}
+      {showAddLead && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowAddLead(false)}>
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Add New Lead</h3>
+              <button onClick={() => setShowAddLead(false)} className="p-1 hover:bg-stone-100 rounded">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Contact Name *</label>
+                <input
+                  type="text"
+                  value={newLead.name}
+                  onChange={(e) => setNewLead({ ...newLead, name: e.target.value })}
+                  placeholder="John Doe"
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Company *</label>
+                <input
+                  type="text"
+                  value={newLead.company}
+                  onChange={(e) => setNewLead({ ...newLead, company: e.target.value })}
+                  placeholder="Acme Corp"
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Email</label>
+                <input
+                  type="email"
+                  value={newLead.email}
+                  onChange={(e) => setNewLead({ ...newLead, email: e.target.value })}
+                  placeholder="john@acme.com"
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Phone</label>
+                <input
+                  type="tel"
+                  value={newLead.phone}
+                  onChange={(e) => setNewLead({ ...newLead, phone: e.target.value })}
+                  placeholder="+1 234 567 8900"
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Value</label>
+                  <input
+                    type="number"
+                    value={newLead.value}
+                    onChange={(e) => setNewLead({ ...newLead, value: Number(e.target.value) })}
+                    placeholder="100000"
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Currency</label>
+                  <select
+                    value={newLead.currency}
+                    onChange={(e) => setNewLead({ ...newLead, currency: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  >
+                    <option value="INR">INR (₹)</option>
+                    <option value="USD">USD ($)</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Source</label>
+                <select
+                  value={newLead.source}
+                  onChange={(e) => setNewLead({ ...newLead, source: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                >
+                  <option value="Website">Website</option>
+                  <option value="Instagram">Instagram</option>
+                  <option value="Referral">Referral</option>
+                  <option value="Ads">Ads</option>
+                  <option value="Cold Call">Cold Call</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button onClick={() => setShowAddLead(false)} className="flex-1 px-4 py-2 border rounded-lg hover:bg-stone-50">
+                Cancel
+              </button>
+              <button 
+                onClick={handleAddLead} 
+                disabled={!newLead.name.trim() || !newLead.company.trim()} 
+                className="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Add Lead
+              </button>
             </div>
           </div>
         </div>

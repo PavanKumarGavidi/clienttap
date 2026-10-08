@@ -15,8 +15,22 @@ export default function MarketingSite() {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
   const [isIndia, setIsIndia] = useState(true);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [cookieOpen, setCookieOpen] = useState(true);
+  const [cookieOpen, setCookieOpen] = useState(() => {
+    // Check if user has already accepted cookies
+    const accepted = localStorage.getItem('clienttap-cookies-accepted');
+    return !accepted;
+  });
   const [journeyStep, setJourneyStep] = useState(0);
+
+  const handleAcceptCookies = () => {
+    localStorage.setItem('clienttap-cookies-accepted', 'true');
+    setCookieOpen(false);
+  };
+
+  const handleRejectCookies = () => {
+    localStorage.setItem('clienttap-cookies-accepted', 'false');
+    setCookieOpen(false);
+  };
 
   const journeyActs = [
     { title: 'The lead', subtitle: 'Act I', steps: ['New enquiry lands in pipeline', 'Auto-tagged by source', 'Assigned to team member', 'Follow-up reminder set'] },
@@ -511,9 +525,9 @@ export default function MarketingSite() {
               <h4 className="font-semibold text-sm mb-1" style={{ color: '#1C1917' }}>Cookie preferences</h4>
               <p className="text-xs" style={{ color: '#78716C' }}>We use cookies to improve your experience.</p>
               <div className="flex items-center gap-2 mt-3">
-                <button onClick={() => setCookieOpen(false)} className="text-xs text-white px-3 py-1.5 rounded-lg font-medium" style={{ backgroundColor: '#ea580c' }}>Accept all</button>
-                <button onClick={() => setCookieOpen(false)} className="text-xs px-3 py-1.5 rounded-lg font-medium border" style={{ borderColor: '#E7E5E4', color: '#1C1917' }}>Manage</button>
-                <button onClick={() => setCookieOpen(false)} className="text-xs px-3 py-1.5 rounded-lg font-medium" style={{ color: '#78716C' }}>Reject</button>
+                <button onClick={handleAcceptCookies} className="text-xs text-white px-3 py-1.5 rounded-lg font-medium" style={{ backgroundColor: '#ea580c' }}>Accept all</button>
+                <button onClick={handleAcceptCookies} className="text-xs px-3 py-1.5 rounded-lg font-medium border" style={{ borderColor: '#E7E5E4', color: '#1C1917' }}>Manage</button>
+                <button onClick={handleRejectCookies} className="text-xs px-3 py-1.5 rounded-lg font-medium" style={{ color: '#78716C' }}>Reject</button>
               </div>
             </div>
           </div>
