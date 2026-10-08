@@ -1,15 +1,32 @@
 import { useState } from 'react';
 import { useApp } from '../App';
-import { projects, clients, teamMembers } from '../data/mockData';
-import { Plus, Search, LayoutGrid, List, Calendar } from 'lucide-react';
+import { useStore } from '../store/StoreContext';
+import { clients, teamMembers } from '../data/mockData';
+import { Plus, Search, LayoutGrid, List, Calendar, X } from 'lucide-react';
 
 export default function Projects() {
   const { darkMode } = useApp();
+  const store = useStore();
   const [viewMode, setViewMode] = useState<'board' | 'list'>('board');
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showAddProject, setShowAddProject] = useState(false);
+  const [newProject, setNewProject] = useState({
+    name: '',
+    clientId: 'c1',
+    type: 'one-off' as 'one-off' | 'retainer',
+    budget: 0,
+    currency: 'INR',
+    startDate: new Date().toISOString().split('T')[0],
+    deadline: '',
+    status: 'ongoing' as 'ongoing' | 'completed',
+    progress: 0,
+    received: 0,
+    pending: 0,
+    team: ['u_001'],
+  });
 
-  const filteredProjects = projects.filter(p => {
+  const filteredProjects = store.projects.filter((p: any) => {
     const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
     return matchesSearch && matchesStatus;
@@ -18,9 +35,39 @@ export default function Projects() {
   const getClient = (id: string) => clients.find(c => c.id === id);
   const getMember = (id: string) => teamMembers.find(m => m.id === id);
 
-  const totalBudget = projects.reduce((s, p) => s + p.budget, 0);
-  const totalReceived = projects.reduce((s, p) => s + p.received, 0);
-  const totalPending = projects.reduce((s, p) => s + p.pending, 0);
+  const totalBudget = store.projects.reduce((s: number, p: any) => s + p.budget, 0);
+  const totalReceived = store.projects.reduce((s: number, p: any) => s + p.received, 0);
+  const totalPending = store.projects.reduce((s: number, p: any) => s + p.pending, 0);
+
+  const handleAddProject = () => {
+    if (!newProject.name || !newProject.deadline) return;
+    store.addProject({
+      ...newProject,
+      budget: Number(newProject.budget),
+    });
+    store.addNotification({
+      type: 'payment',
+      title: 'New project created',
+      message: newProject.name,
+      time: 'Just now',
+      read: false,
+    });
+    setNewProject({
+      name: '',
+      clientId: 'c1',
+      type: 'one-off',
+      budget: 0,
+      currency: 'INR',
+      startDate: new Date().toISOString().split('T')[0],
+      deadline: '',
+      status: 'ongoing',
+      progress: 0,
+      received: 0,
+      pending: 0,
+      team: ['u_001'],
+    });
+    setShowAddProject(false);
+  };
 
   const cardClass = `rounded-xl border bg-white`;
   const cardBorder = { borderColor: '#E7E5E4' };
@@ -31,9 +78,9 @@ export default function Projects() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold">Projects</h1>
-          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{projects.length} projects · {projects.filter(p => p.status === 'ongoing').length} active</p>
+          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{store.projects.length} projects · {store.projects.filter((p: any) => p.status === 'ongoing').length} active</p>
         </div>
-        <button className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition">
+        <button onClick={() => setShowAddProject(true)} className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition">
           <Plus className="w-4 h-4" /> New Project
         </button>
       </div>
@@ -209,6 +256,100 @@ export default function Projects() {
               })}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Add Project Modal */}
+      {showAddProject && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowAddProject(false)}>
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Create New Project</h3>
+              <button onClick={() => setShowAddProject(false)} className="p-1 hover:bg-stone-100 rounded">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Project Name *</label>
+                <input
+                  type="text"
+                  value={newProject.name}
+                  onChange={(e) => setNewProject({ ...newProject, name: e.target.value })}
+                  placeholder="E-commerce Redesign"
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Client</label>
+                <select
+                  value={newProject.clientId}
+                  onChange={(e) => setNewProject({ ...newProject, clientId: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                >
+                  {clients.map(c => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Budget</label>
+                  <input
+                    type="number"
+                    value={newProject.budget}
+                    onChange={(e) => setNewProject({ ...newProject, budget: Number(e.target.value) })}
+                    placeholder="100000"
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Currency</label>
+                  <select
+                    value={newProject.currency}
+                    onChange={(e) => setNewProject({ ...newProject, currency: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  >
+                    <option value="INR">INR (₹)</option>
+                    <option value="USD">USD ($)</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Deadline *</label>
+                <input
+                  type="date"
+                  value={newProject.deadline}
+                  onChange={(e) => setNewProject({ ...newProject, deadline: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Type</label>
+                <select
+                  value={newProject.type}
+                  onChange={(e) => setNewProject({ ...newProject, type: e.target.value as 'one-off' | 'retainer' })}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                >
+                  <option value="one-off">One-off</option>
+                  <option value="retainer">Retainer</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button onClick={() => setShowAddProject(false)} className="flex-1 px-4 py-2 border rounded-lg hover:bg-stone-50">
+                Cancel
+              </button>
+              <button 
+                onClick={handleAddProject} 
+                disabled={!newProject.name.trim() || !newProject.deadline} 
+                className="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Create Project
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
