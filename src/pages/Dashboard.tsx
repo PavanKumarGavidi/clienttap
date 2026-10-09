@@ -84,8 +84,8 @@ export default function Dashboard() {
     setShowScheduleMeeting(false);
   };
 
-  const card = "bg-white rounded-2xl border p-5";
-  const cardBorder = { borderColor: '#E7E5E4' };
+  const card = "bg-white rounded-2xl p-5";
+  const cardBorder = { border: '1px solid #E7E5E4' };
   const inkMuted = { color: '#78716C' };
   const inkFaint = { color: '#A8A29E' };
   const ink = { color: '#1C1917' };
@@ -202,7 +202,7 @@ export default function Dashboard() {
             <p className="text-xs" style={inkMuted}>Total clients</p>
             <p className="text-lg font-bold mt-0.5" style={ink}>{clients.length}</p>
           </div>
-          <div className="bg-gradient-to-br from-orange-50 to-white rounded-2xl border p-4" style={cardBorder}>
+          <div className="bg-gradient-to-br from-orange-50 to-white rounded-2xl p-4" style={cardBorder}>
             <p className="text-xs" style={inkMuted}>Active retainers</p>
             <p className="text-lg font-bold mt-0.5" style={ink}>{activeRetainers}</p>
             <p className="text-xs mt-0.5 flex items-center gap-1" style={{ color: '#ea580c' }}>
@@ -351,7 +351,7 @@ export default function Dashboard() {
 
         {/* Quick actions */}
         <div className="grid grid-cols-2 gap-3">
-          <button onClick={() => setShowAddClient(true)} className="bg-white rounded-2xl border p-5 flex flex-col items-start justify-between h-full hover:shadow-md transition group" style={cardBorder}>
+          <button onClick={() => setShowAddClient(true)} className="bg-white rounded-2xl p-5 flex flex-col items-start justify-between h-full hover:shadow-md transition group" style={cardBorder}>
             <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition" style={{ backgroundColor: '#fff7ed' }}>
               <Plus className="w-5 h-5" style={{ color: '#ea580c' }} />
             </div>
@@ -360,7 +360,7 @@ export default function Dashboard() {
               <p className="text-xs mt-0.5" style={inkFaint}>New client profile</p>
             </div>
           </button>
-          <button onClick={() => setShowScheduleMeeting(true)} className="bg-white rounded-2xl border p-5 flex flex-col items-start justify-between h-full hover:shadow-md transition group" style={cardBorder}>
+          <button onClick={() => setShowScheduleMeeting(true)} className="bg-white rounded-2xl p-5 flex flex-col items-start justify-between h-full hover:shadow-md transition group" style={cardBorder}>
             <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition" style={{ backgroundColor: '#fff7ed' }}>
               <Calendar className="w-5 h-5" style={{ color: '#ea580c' }} />
             </div>
@@ -390,7 +390,8 @@ export default function Dashboard() {
                   value={newClientName}
                   onChange={(e) => setNewClientName(e.target.value)}
                   placeholder="Enter client name"
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4' }}
                   autoFocus
                 />
               </div>
@@ -401,12 +402,13 @@ export default function Dashboard() {
                   value={newClientEmail}
                   onChange={(e) => setNewClientEmail(e.target.value)}
                   placeholder="client@example.com"
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4' }}
                 />
               </div>
             </div>
             <div className="flex gap-3 mt-6">
-              <button onClick={() => setShowAddClient(false)} className="flex-1 px-4 py-2 border rounded-lg hover:bg-stone-50">
+              <button onClick={() => setShowAddClient(false)} className="flex-1 px-4 py-2 rounded-lg hover:bg-stone-50" style={{ border: '1px solid #E7E5E4' }}>
                 Cancel
               </button>
               <button onClick={handleAddClient} disabled={!newClientName.trim()} className="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed">
@@ -435,7 +437,8 @@ export default function Dashboard() {
                   value={meetingTitle}
                   onChange={(e) => setMeetingTitle(e.target.value)}
                   placeholder="e.g., Project kickoff"
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4' }}
                   autoFocus
                 />
               </div>
@@ -445,7 +448,8 @@ export default function Dashboard() {
                   type="date"
                   value={meetingDate}
                   onChange={(e) => setMeetingDate(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4' }}
                 />
               </div>
               <div>
@@ -454,12 +458,13 @@ export default function Dashboard() {
                   type="time"
                   value={meetingTime}
                   onChange={(e) => setMeetingTime(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4' }}
                 />
               </div>
             </div>
             <div className="flex gap-3 mt-6">
-              <button onClick={() => setShowScheduleMeeting(false)} className="flex-1 px-4 py-2 border rounded-lg hover:bg-stone-50">
+              <button onClick={() => setShowScheduleMeeting(false)} className="flex-1 px-4 py-2 rounded-lg hover:bg-stone-50" style={{ border: '1px solid #E7E5E4' }}>
                 Cancel
               </button>
               <button onClick={handleScheduleMeeting} disabled={!meetingTitle.trim() || !meetingDate} className="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed">

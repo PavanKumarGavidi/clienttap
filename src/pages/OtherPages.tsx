@@ -337,8 +337,8 @@ function TasksPage() {
                   value={newTask.title}
                   onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
                   placeholder="Design homepage mockup"
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  style={{ borderColor: '#E7E5E4', color: '#1C1917' }}
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4', color: '#1C1917' }}
                   autoFocus
                 />
               </div>
@@ -347,8 +347,8 @@ function TasksPage() {
                 <select
                   value={newTask.assignee}
                   onChange={(e) => setNewTask({ ...newTask, assignee: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  style={{ borderColor: '#E7E5E4', color: '#1C1917' }}
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4', color: '#1C1917' }}
                 >
                   {teamMembers.map(m => (
                     <option key={m.id} value={m.id}>{m.name}</option>
@@ -361,8 +361,8 @@ function TasksPage() {
                   type="date"
                   value={newTask.dueDate}
                   onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  style={{ borderColor: '#E7E5E4', color: '#1C1917' }}
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4', color: '#1C1917' }}
                 />
               </div>
               <div>
@@ -370,8 +370,8 @@ function TasksPage() {
                 <select
                   value={newTask.priority}
                   onChange={(e) => setNewTask({ ...newTask, priority: e.target.value as any })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  style={{ borderColor: '#E7E5E4', color: '#1C1917' }}
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4', color: '#1C1917' }}
                 >
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
@@ -380,7 +380,7 @@ function TasksPage() {
               </div>
             </div>
             <div className="flex gap-3 mt-6">
-              <button onClick={() => setShowAddTask(false)} className="flex-1 px-4 py-2 border rounded-lg hover:bg-stone-50" style={{ borderColor: '#E7E5E4', color: '#1C1917' }}>
+              <button onClick={() => setShowAddTask(false)} className="flex-1 px-4 py-2 rounded-lg hover:bg-stone-50" style={{ border: '1px solid #E7E5E4', color: '#1C1917' }}>
                 Cancel
               </button>
               <button 
@@ -513,8 +513,8 @@ function DocumentsPage() {
                   value={newDocument.title}
                   onChange={(e) => setNewDocument({ ...newDocument, title: e.target.value })}
                   placeholder="Service Agreement"
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  style={{ borderColor: '#E7E5E4', color: '#1C1917' }}
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4', color: '#1C1917' }}
                   autoFocus
                 />
               </div>
@@ -523,8 +523,8 @@ function DocumentsPage() {
                 <select
                   value={newDocument.type}
                   onChange={(e) => setNewDocument({ ...newDocument, type: e.target.value as any })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  style={{ borderColor: '#E7E5E4', color: '#1C1917' }}
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4', color: '#1C1917' }}
                 >
                   <option value="contract">Contract</option>
                   <option value="proposal">Proposal</option>
@@ -534,7 +534,7 @@ function DocumentsPage() {
               </div>
             </div>
             <div className="flex gap-3 mt-6">
-              <button onClick={() => setShowAddDocument(false)} className="flex-1 px-4 py-2 border rounded-lg hover:bg-stone-50" style={{ borderColor: '#E7E5E4', color: '#1C1917' }}>
+              <button onClick={() => setShowAddDocument(false)} className="flex-1 px-4 py-2 rounded-lg hover:bg-stone-50" style={{ border: '1px solid #E7E5E4', color: '#1C1917' }}>
                 Cancel
               </button>
               <button 

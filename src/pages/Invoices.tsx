@@ -284,7 +284,8 @@ export default function Invoices() {
                 <select
                   value={newInvoice.clientId}
                   onChange={(e) => setNewInvoice({ ...newInvoice, clientId: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4' }}
                 >
                   {clients.map(c => (
                     <option key={c.id} value={c.id}>{c.name}</option>
@@ -298,7 +299,8 @@ export default function Invoices() {
                   value={newInvoice.amount}
                   onChange={(e) => setNewInvoice({ ...newInvoice, amount: Number(e.target.value) })}
                   placeholder="100000"
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4' }}
                   autoFocus
                 />
               </div>
@@ -308,7 +310,8 @@ export default function Invoices() {
                   <select
                     value={newInvoice.currency}
                     onChange={(e) => setNewInvoice({ ...newInvoice, currency: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    style={{ border: '1px solid #E7E5E4' }}
                   >
                     <option value="INR">INR (₹)</option>
                     <option value="USD">USD ($)</option>
@@ -320,7 +323,8 @@ export default function Invoices() {
                     type="number"
                     value={newInvoice.gst}
                     onChange={(e) => setNewInvoice({ ...newInvoice, gst: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    style={{ border: '1px solid #E7E5E4' }}
                   />
                 </div>
               </div>
@@ -330,7 +334,8 @@ export default function Invoices() {
                   type="date"
                   value={newInvoice.dueDate}
                   onChange={(e) => setNewInvoice({ ...newInvoice, dueDate: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4' }}
                 />
               </div>
               <div>
@@ -338,7 +343,8 @@ export default function Invoices() {
                 <select
                   value={newInvoice.type}
                   onChange={(e) => setNewInvoice({ ...newInvoice, type: e.target.value as 'intra-state' | 'inter-state' })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4' }}
                 >
                   <option value="intra-state">Intra-state (CGST + SGST)</option>
                   <option value="inter-state">Inter-state (IGST)</option>
@@ -346,7 +352,7 @@ export default function Invoices() {
               </div>
             </div>
             <div className="flex gap-3 mt-6">
-              <button onClick={() => setShowNewInvoice(false)} className="flex-1 px-4 py-2 border rounded-lg hover:bg-stone-50">
+              <button onClick={() => setShowNewInvoice(false)} className="flex-1 px-4 py-2 rounded-lg hover:bg-stone-50" style={{ border: '1px solid #E7E5E4' }}>
                 Cancel
               </button>
               <button 
@@ -377,7 +383,8 @@ export default function Invoices() {
                 <select
                   value={newPayment.invoiceId}
                   onChange={(e) => setNewPayment({ ...newPayment, invoiceId: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4' }}
                 >
                   <option value="">Select invoice</option>
                   {store.invoices.filter((i: any) => i.status !== 'paid').map((inv: any) => (
@@ -392,7 +399,8 @@ export default function Invoices() {
                   value={newPayment.amount}
                   onChange={(e) => setNewPayment({ ...newPayment, amount: Number(e.target.value) })}
                   placeholder="100000"
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4' }}
                   autoFocus
                 />
               </div>
@@ -401,7 +409,8 @@ export default function Invoices() {
                 <select
                   value={newPayment.method}
                   onChange={(e) => setNewPayment({ ...newPayment, method: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4' }}
                 >
                   <option value="Bank Transfer">Bank Transfer</option>
                   <option value="UPI">UPI</option>
@@ -416,12 +425,13 @@ export default function Invoices() {
                   value={newPayment.reference}
                   onChange={(e) => setNewPayment({ ...newPayment, reference: e.target.value })}
                   placeholder="UTR123456789"
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4' }}
                 />
               </div>
             </div>
             <div className="flex gap-3 mt-6">
-              <button onClick={() => setShowRecordPayment(false)} className="flex-1 px-4 py-2 border rounded-lg hover:bg-stone-50">
+              <button onClick={() => setShowRecordPayment(false)} className="flex-1 px-4 py-2 rounded-lg hover:bg-stone-50" style={{ border: '1px solid #E7E5E4' }}>
                 Cancel
               </button>
               <button 

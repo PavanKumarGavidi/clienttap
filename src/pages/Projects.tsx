@@ -276,7 +276,8 @@ export default function Projects() {
                   value={newProject.name}
                   onChange={(e) => setNewProject({ ...newProject, name: e.target.value })}
                   placeholder="E-commerce Redesign"
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4' }}
                   autoFocus
                 />
               </div>
@@ -285,7 +286,8 @@ export default function Projects() {
                 <select
                   value={newProject.clientId}
                   onChange={(e) => setNewProject({ ...newProject, clientId: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4' }}
                 >
                   {clients.map(c => (
                     <option key={c.id} value={c.id}>{c.name}</option>
@@ -300,7 +302,8 @@ export default function Projects() {
                     value={newProject.budget}
                     onChange={(e) => setNewProject({ ...newProject, budget: Number(e.target.value) })}
                     placeholder="100000"
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    style={{ border: '1px solid #E7E5E4' }}
                   />
                 </div>
                 <div>
@@ -308,7 +311,8 @@ export default function Projects() {
                   <select
                     value={newProject.currency}
                     onChange={(e) => setNewProject({ ...newProject, currency: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    style={{ border: '1px solid #E7E5E4' }}
                   >
                     <option value="INR">INR (₹)</option>
                     <option value="USD">USD ($)</option>
@@ -321,7 +325,8 @@ export default function Projects() {
                   type="date"
                   value={newProject.deadline}
                   onChange={(e) => setNewProject({ ...newProject, deadline: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4' }}
                 />
               </div>
               <div>
@@ -329,7 +334,8 @@ export default function Projects() {
                 <select
                   value={newProject.type}
                   onChange={(e) => setNewProject({ ...newProject, type: e.target.value as 'one-off' | 'retainer' })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4' }}
                 >
                   <option value="one-off">One-off</option>
                   <option value="retainer">Retainer</option>
@@ -337,7 +343,7 @@ export default function Projects() {
               </div>
             </div>
             <div className="flex gap-3 mt-6">
-              <button onClick={() => setShowAddProject(false)} className="flex-1 px-4 py-2 border rounded-lg hover:bg-stone-50">
+              <button onClick={() => setShowAddProject(false)} className="flex-1 px-4 py-2 rounded-lg hover:bg-stone-50" style={{ border: '1px solid #E7E5E4' }}>
                 Cancel
               </button>
               <button 

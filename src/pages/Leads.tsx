@@ -321,7 +321,8 @@ export default function Leads() {
                   value={newLead.name}
                   onChange={(e) => setNewLead({ ...newLead, name: e.target.value })}
                   placeholder="John Doe"
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4' }}
                   autoFocus
                 />
               </div>
@@ -332,7 +333,8 @@ export default function Leads() {
                   value={newLead.company}
                   onChange={(e) => setNewLead({ ...newLead, company: e.target.value })}
                   placeholder="Acme Corp"
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4' }}
                 />
               </div>
               <div>
@@ -342,7 +344,8 @@ export default function Leads() {
                   value={newLead.email}
                   onChange={(e) => setNewLead({ ...newLead, email: e.target.value })}
                   placeholder="john@acme.com"
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4' }}
                 />
               </div>
               <div>
@@ -352,7 +355,8 @@ export default function Leads() {
                   value={newLead.phone}
                   onChange={(e) => setNewLead({ ...newLead, phone: e.target.value })}
                   placeholder="+1 234 567 8900"
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4' }}
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -363,7 +367,8 @@ export default function Leads() {
                     value={newLead.value}
                     onChange={(e) => setNewLead({ ...newLead, value: Number(e.target.value) })}
                     placeholder="100000"
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    style={{ border: '1px solid #E7E5E4' }}
                   />
                 </div>
                 <div>
@@ -371,7 +376,8 @@ export default function Leads() {
                   <select
                     value={newLead.currency}
                     onChange={(e) => setNewLead({ ...newLead, currency: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    style={{ border: '1px solid #E7E5E4' }}
                   >
                     <option value="INR">INR (₹)</option>
                     <option value="USD">USD ($)</option>
@@ -383,7 +389,8 @@ export default function Leads() {
                 <select
                   value={newLead.source}
                   onChange={(e) => setNewLead({ ...newLead, source: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  style={{ border: '1px solid #E7E5E4' }}
                 >
                   <option value="Website">Website</option>
                   <option value="Instagram">Instagram</option>
@@ -394,7 +401,7 @@ export default function Leads() {
               </div>
             </div>
             <div className="flex gap-3 mt-6">
-              <button onClick={() => setShowAddLead(false)} className="flex-1 px-4 py-2 border rounded-lg hover:bg-stone-50">
+              <button onClick={() => setShowAddLead(false)} className="flex-1 px-4 py-2 rounded-lg hover:bg-stone-50" style={{ border: '1px solid #E7E5E4' }}>
                 Cancel
               </button>
               <button 
