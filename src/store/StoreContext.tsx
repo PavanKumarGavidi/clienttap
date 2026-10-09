@@ -240,10 +240,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   // Client actions
   const addClient = async (client: any) => {
     const workspaceId = getWorkspaceId();
-    if (!workspaceId) return;
+    if (!workspaceId) {
+      console.error('Cannot add client: no workspace ID');
+      return;
+    }
     
+    console.log('Adding client to workspace:', workspaceId, client);
     const newClient = { ...client, id: genId('c'), workspace_id: workspaceId };
     await storage.addItem(workspaceId, 'clients', newClient);
+    console.log('Client added to state');
     setClients(prev => [...prev, newClient]);
   };
   
@@ -350,10 +355,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   // Meeting actions
   const addMeeting = async (meeting: any) => {
     const workspaceId = getWorkspaceId();
-    if (!workspaceId) return;
+    if (!workspaceId) {
+      console.error('Cannot add meeting: no workspace ID');
+      return;
+    }
     
+    console.log('Adding meeting to workspace:', workspaceId, meeting);
     const newMeeting = { ...meeting, id: genId('m'), workspace_id: workspaceId };
     await storage.addItem(workspaceId, 'meetings', newMeeting);
+    console.log('Meeting added to state');
     setMeetings(prev => [...prev, newMeeting]);
   };
   
@@ -418,17 +428,37 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   };
   
   const updateProfile = async (updates: any) => {
-    if (!currentUser) return;
-    await auth.updateProfile(currentUser.id, updates);
-    const user = await auth.getCurrentUser();
-    setCurrentUser(user);
+    if (!currentUser) {
+      console.error('Cannot update profile: no current user');
+      return;
+    }
+    try {
+      console.log('Updating profile in store:', updates);
+      await auth.updateProfile(currentUser.id, updates);
+      const user = await auth.getCurrentUser();
+      console.log('Profile updated, new user:', user);
+      setCurrentUser(user);
+    } catch (error) {
+      console.error('Error in updateProfile:', error);
+      throw error;
+    }
   };
   
   const updateWorkspace = async (updates: any) => {
-    if (!currentWorkspace) return;
-    await auth.updateWorkspace(currentWorkspace.id, updates);
-    const workspace = await auth.getCurrentWorkspace();
-    setCurrentWorkspace(workspace);
+    if (!currentWorkspace) {
+      console.error('Cannot update workspace: no current workspace');
+      return;
+    }
+    try {
+      console.log('Updating workspace in store:', updates);
+      await auth.updateWorkspace(currentWorkspace.id, updates);
+      const workspace = await auth.getCurrentWorkspace();
+      console.log('Workspace updated, new workspace:', workspace);
+      setCurrentWorkspace(workspace);
+    } catch (error) {
+      console.error('Error in updateWorkspace:', error);
+      throw error;
+    }
   };
   
   if (loading) {

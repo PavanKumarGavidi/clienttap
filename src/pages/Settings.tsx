@@ -14,31 +14,31 @@ export default function Settings() {
   const currentUser = store.currentUser;
   const currentWorkspace = store.currentWorkspace;
   
-  // Profile state
+  // Profile state - initialize once
   const [profileName, setProfileName] = useState(currentUser?.name || '');
   const [profileEmail, setProfileEmail] = useState(currentUser?.email || '');
   const [profilePhone, setProfilePhone] = useState('');
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   
-  // Workspace state
+  // Workspace state - initialize once
   const [workspaceName, setWorkspaceName] = useState(currentWorkspace?.name || '');
   const [workspaceSlug, setWorkspaceSlug] = useState(currentWorkspace?.slug || '');
   const [workspaceCurrency, setWorkspaceCurrency] = useState(currentWorkspace?.currency || 'INR');
   const [workspaceTimezone, setTimezone] = useState(currentWorkspace?.timezone || 'Asia/Kolkata');
   
-  // Update state when user/workspace changes
+  // Only sync on initial load, not on every change
   useEffect(() => {
-    if (currentUser) {
+    if (currentUser && !profileName) {
       setProfileName(currentUser.name || '');
       setProfileEmail(currentUser.email || '');
     }
-    if (currentWorkspace) {
+    if (currentWorkspace && !workspaceName) {
       setWorkspaceName(currentWorkspace.name || '');
       setWorkspaceSlug(currentWorkspace.slug || '');
       setWorkspaceCurrency(currentWorkspace.currency || 'INR');
       setTimezone(currentWorkspace.timezone || 'Asia/Kolkata');
     }
-  }, [currentUser, currentWorkspace]);
+  }, []);
   
   const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -58,17 +58,20 @@ export default function Settings() {
   
   const handleSaveProfile = async () => {
     setSaving(true);
+    setSaveSuccess(false);
     try {
+      console.log('Saving profile:', { profileName, profileEmail, avatarPreview });
       await store.updateProfile({
         name: profileName,
         email: profileEmail,
         avatar: avatarPreview || currentUser?.avatar
       });
+      console.log('Profile saved successfully');
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error) {
       console.error('Error saving profile:', error);
-      alert('Failed to save profile');
+      alert('Failed to save profile. Check console for details.');
     } finally {
       setSaving(false);
     }
@@ -76,18 +79,21 @@ export default function Settings() {
   
   const handleSaveWorkspace = async () => {
     setSaving(true);
+    setSaveSuccess(false);
     try {
+      console.log('Saving workspace:', { workspaceName, workspaceSlug, workspaceCurrency, workspaceTimezone });
       await store.updateWorkspace({
         name: workspaceName,
         slug: workspaceSlug,
         currency: workspaceCurrency,
         timezone: workspaceTimezone
       });
+      console.log('Workspace saved successfully');
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error) {
       console.error('Error saving workspace:', error);
-      alert('Failed to save workspace');
+      alert('Failed to save workspace. Check console for details.');
     } finally {
       setSaving(false);
     }

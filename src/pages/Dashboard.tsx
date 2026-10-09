@@ -40,48 +40,62 @@ export default function Dashboard() {
 
   const upcomingMeetings = meetings.filter(m => m.status === 'upcoming').slice(0, 4);
 
-  const handleAddClient = () => {
+  const handleAddClient = async () => {
     if (!newClientName) return;
-    store.addClient({
-      name: newClientName,
-      company: newClientName,
-      email: newClientEmail,
-      phone: '',
-      address: '',
-      gstin: '',
-      currency: 'INR',
-      currencySymbol: '₹',
-      owner: 'u_001',
-      portalEnabled: false,
-      totalProjects: 0,
-      totalInvoiced: 0,
-      totalPaid: 0,
-      outstanding: 0,
-      since: new Date().toISOString().split('T')[0],
-    });
-    store.addNotification({ type: 'payment', title: 'New client added', message: `${newClientName} has been added`, time: 'Just now', read: false });
-    setNewClientName('');
-    setNewClientEmail('');
-    setShowAddClient(false);
+    try {
+      console.log('Adding client:', newClientName);
+      await store.addClient({
+        name: newClientName,
+        company: newClientName,
+        email: newClientEmail,
+        phone: '',
+        address: '',
+        gstin: '',
+        currency: 'INR',
+        currencySymbol: '₹',
+        owner: 'u_001',
+        portalEnabled: false,
+        totalProjects: 0,
+        totalInvoiced: 0,
+        totalPaid: 0,
+        outstanding: 0,
+        since: new Date().toISOString().split('T')[0],
+      });
+      console.log('Client added successfully');
+      await store.addNotification({ type: 'payment', title: 'New client added', message: `${newClientName} has been added`, time: 'Just now', read: false });
+      setNewClientName('');
+      setNewClientEmail('');
+      setShowAddClient(false);
+    } catch (error) {
+      console.error('Error adding client:', error);
+      alert('Failed to add client. Please try again.');
+    }
   };
 
-  const handleScheduleMeeting = () => {
+  const handleScheduleMeeting = async () => {
     if (!meetingTitle || !meetingDate) return;
-    store.addMeeting({
-      title: meetingTitle,
-      clientId: 'c1',
-      date: meetingDate,
-      time: meetingTime || '10:00',
-      duration: 30,
-      attendees: ['u_001'],
-      status: 'upcoming',
-      notes: '',
-    });
-    store.addNotification({ type: 'meeting', title: 'Meeting scheduled', message: meetingTitle, time: 'Just now', read: false });
-    setMeetingTitle('');
-    setMeetingDate('');
-    setMeetingTime('');
-    setShowScheduleMeeting(false);
+    try {
+      console.log('Scheduling meeting:', meetingTitle);
+      await store.addMeeting({
+        title: meetingTitle,
+        clientId: 'c1',
+        date: meetingDate,
+        time: meetingTime || '10:00',
+        duration: 30,
+        attendees: ['u_001'],
+        status: 'upcoming',
+        notes: '',
+      });
+      console.log('Meeting scheduled successfully');
+      await store.addNotification({ type: 'meeting', title: 'Meeting scheduled', message: meetingTitle, time: 'Just now', read: false });
+      setMeetingTitle('');
+      setMeetingDate('');
+      setMeetingTime('');
+      setShowScheduleMeeting(false);
+    } catch (error) {
+      console.error('Error scheduling meeting:', error);
+      alert('Failed to schedule meeting. Please try again.');
+    }
   };
 
   const card = "bg-white rounded-2xl p-5";

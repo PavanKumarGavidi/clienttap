@@ -272,18 +272,34 @@ export const auth = {
 
   // Update user profile
   async updateProfile(userId: string, updates: Partial<User>): Promise<void> {
-    await supabase
+    console.log('Updating profile:', userId, updates);
+    const { data, error } = await supabase
       .from('profiles')
       .update(updates)
-      .eq('id', userId);
+      .eq('id', userId)
+      .select();
+    
+    if (error) {
+      console.error('Error updating profile:', error);
+      throw error;
+    }
+    console.log('Profile updated successfully:', data);
   },
 
   // Update workspace
   async updateWorkspace(workspaceId: string, updates: Partial<Workspace>): Promise<void> {
-    await supabase
+    console.log('Updating workspace:', workspaceId, updates);
+    const { data, error } = await supabase
       .from('workspaces')
       .update(updates)
-      .eq('id', workspaceId);
+      .eq('id', workspaceId)
+      .select();
+    
+    if (error) {
+      console.error('Error updating workspace:', error);
+      throw error;
+    }
+    console.log('Workspace updated successfully:', data);
   },
 
   // Forgot password

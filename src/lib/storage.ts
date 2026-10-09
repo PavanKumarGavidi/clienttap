@@ -92,14 +92,17 @@ export const storage = {
     collection: K,
     item: any
   ): Promise<void> {
-    const { error } = await supabase
+    console.log(`Adding ${collection} to workspace ${workspaceId}:`, item);
+    const { data, error } = await supabase
       .from(collection)
-      .insert({ ...item, workspace_id: workspaceId });
+      .insert({ ...item, workspace_id: workspaceId })
+      .select();
     
     if (error) {
       console.error(`Error adding ${collection}:`, error);
       throw error;
     }
+    console.log(`${collection} added successfully:`, data);
   },
 
   // Update item in collection
