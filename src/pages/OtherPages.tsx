@@ -188,18 +188,25 @@ function TasksPage() {
   const [newTask, setNewTask] = useState({ title: '', assignee: 'u_001', dueDate: '', priority: 'medium' as 'high' | 'medium' | 'low', projectId: 'p1' });
 
   const handleAddTask = async () => {
-    if (!newTask.title.trim()) return;
+    if (!newTask.title.trim()) {
+      alert('Please enter a task title');
+      return;
+    }
     try {
       console.log('Adding task:', newTask);
-      await store.addTask({
+      const taskData = {
         title: newTask.title,
-        assignee: newTask.assignee,
-        due_date: newTask.dueDate,
-        priority: newTask.priority,
-        project_id: newTask.projectId,
+        assignee: newTask.assignee || 'u_001',
+        due_date: newTask.dueDate || '',
+        priority: newTask.priority || 'medium',
+        project_id: newTask.projectId || 'p1',
         status: 'todo',
-      });
+      };
+      console.log('Task data:', taskData);
+      
+      await store.addTask(taskData);
       console.log('Task added successfully');
+      
       await store.addNotification({
         type: 'payment',
         title: 'New task created',
@@ -207,12 +214,15 @@ function TasksPage() {
         time: 'Just now',
         read: false,
       });
+      
       setNewTask({ title: '', assignee: 'u_001', dueDate: '', priority: 'medium', projectId: 'p1' });
       setShowAddTask(false);
       alert('Task created successfully!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding task:', error);
-      alert('Failed to create task. Check console for details.');
+      console.error('Error details:', error.message);
+      console.error('Error stack:', error.stack);
+      alert(`Failed to create task: ${error.message || 'Unknown error'}. Check console for details.`);
     }
   };
 

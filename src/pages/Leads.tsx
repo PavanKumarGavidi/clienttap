@@ -102,23 +102,30 @@ export default function Leads() {
   };
 
   const handleAddLead = async () => {
-    if (!newLead.name || !newLead.company) return;
+    if (!newLead.name || !newLead.company) {
+      alert('Please enter both name and company');
+      return;
+    }
     try {
       console.log('Adding lead:', newLead);
-      await store.addLead({
+      const leadData = {
         name: newLead.name,
         company: newLead.company,
-        email: newLead.email,
-        phone: newLead.phone,
-        value: newLead.value,
-        currency: newLead.currency,
+        email: newLead.email || '',
+        phone: newLead.phone || '',
+        value: newLead.value || 0,
+        currency: newLead.currency || 'INR',
         stage: 's1',
-        source: newLead.source,
-        assigned_to: newLead.assignedTo,
+        source: newLead.source || 'Website',
+        assigned_to: newLead.assignedTo || 'u_001',
         follow_up: false,
         created_at: new Date().toISOString().split('T')[0],
-      });
+      };
+      console.log('Lead data:', leadData);
+      
+      await store.addLead(leadData);
       console.log('Lead added successfully');
+      
       await store.addNotification({
         type: 'payment',
         title: 'New lead added',
@@ -126,12 +133,15 @@ export default function Leads() {
         time: 'Just now',
         read: false,
       });
+      
       setNewLead({ name: '', company: '', email: '', phone: '', value: 0, currency: 'INR', source: 'Website', assignedTo: 'u_001' });
       setShowAddLead(false);
       alert('Lead added successfully!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding lead:', error);
-      alert('Failed to add lead. Check console for details.');
+      console.error('Error details:', error.message);
+      console.error('Error stack:', error.stack);
+      alert(`Failed to add lead: ${error.message || 'Unknown error'}. Check console for details.`);
     }
   };
 

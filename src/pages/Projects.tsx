@@ -40,23 +40,30 @@ export default function Projects() {
   const totalPending = store.projects.reduce((s: number, p: any) => s + p.pending, 0);
 
   const handleAddProject = async () => {
-    if (!newProject.name || !newProject.deadline) return;
+    if (!newProject.name || !newProject.deadline) {
+      alert('Please enter project name and deadline');
+      return;
+    }
     try {
       console.log('Adding project:', newProject);
-      await store.addProject({
+      const projectData = {
         name: newProject.name,
-        client_id: newProject.clientId,
-        type: newProject.type,
-        budget: Number(newProject.budget),
-        currency: newProject.currency,
-        start_date: newProject.startDate,
+        client_id: newProject.clientId || '',
+        type: newProject.type || 'one-off',
+        budget: Number(newProject.budget) || 0,
+        currency: newProject.currency || 'INR',
+        start_date: newProject.startDate || new Date().toISOString().split('T')[0],
         deadline: newProject.deadline,
-        status: newProject.status,
-        progress: newProject.progress,
-        received: newProject.received,
-        pending: newProject.pending,
-      });
+        status: newProject.status || 'ongoing',
+        progress: newProject.progress || 0,
+        received: newProject.received || 0,
+        pending: newProject.pending || 0,
+      };
+      console.log('Project data:', projectData);
+      
+      await store.addProject(projectData);
       console.log('Project added successfully');
+      
       await store.addNotification({
         type: 'payment',
         title: 'New project created',
@@ -64,6 +71,7 @@ export default function Projects() {
         time: 'Just now',
         read: false,
       });
+      
       setNewProject({
         name: '',
         clientId: 'c1',
@@ -80,9 +88,11 @@ export default function Projects() {
       });
       setShowAddProject(false);
       alert('Project created successfully!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding project:', error);
-      alert('Failed to create project. Check console for details.');
+      console.error('Error details:', error.message);
+      console.error('Error stack:', error.stack);
+      alert(`Failed to create project: ${error.message || 'Unknown error'}. Check console for details.`);
     }
   };
 

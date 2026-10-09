@@ -41,13 +41,16 @@ export default function Dashboard() {
   const upcomingMeetings = meetings.filter(m => m.status === 'upcoming').slice(0, 4);
 
   const handleAddClient = async () => {
-    if (!newClientName) return;
+    if (!newClientName) {
+      alert('Please enter a client name');
+      return;
+    }
     try {
       console.log('Adding client:', newClientName);
-      await store.addClient({
+      const clientData = {
         name: newClientName,
         company: newClientName,
-        email: newClientEmail,
+        email: newClientEmail || '',
         phone: '',
         address: '',
         gstin: '',
@@ -60,8 +63,12 @@ export default function Dashboard() {
         total_paid: 0,
         outstanding: 0,
         since: new Date().toISOString().split('T')[0],
-      });
+      };
+      console.log('Client data:', clientData);
+      
+      await store.addClient(clientData);
       console.log('Client added successfully');
+      
       await store.addNotification({ 
         type: 'payment', 
         title: 'New client added', 
@@ -69,21 +76,27 @@ export default function Dashboard() {
         time: 'Just now', 
         read: false 
       });
+      
       setNewClientName('');
       setNewClientEmail('');
       setShowAddClient(false);
       alert('Client added successfully!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding client:', error);
-      alert('Failed to add client. Check console for details.');
+      console.error('Error details:', error.message);
+      console.error('Error stack:', error.stack);
+      alert(`Failed to add client: ${error.message || 'Unknown error'}. Check console for details.`);
     }
   };
 
   const handleScheduleMeeting = async () => {
-    if (!meetingTitle || !meetingDate) return;
+    if (!meetingTitle || !meetingDate) {
+      alert('Please enter meeting title and date');
+      return;
+    }
     try {
       console.log('Scheduling meeting:', meetingTitle);
-      await store.addMeeting({
+      const meetingData = {
         title: meetingTitle,
         client_id: 'c1',
         date: meetingDate,
@@ -92,8 +105,12 @@ export default function Dashboard() {
         attendees: ['u_001'],
         status: 'upcoming',
         notes: '',
-      });
+      };
+      console.log('Meeting data:', meetingData);
+      
+      await store.addMeeting(meetingData);
       console.log('Meeting scheduled successfully');
+      
       await store.addNotification({ 
         type: 'meeting', 
         title: 'Meeting scheduled', 
@@ -101,14 +118,17 @@ export default function Dashboard() {
         time: 'Just now', 
         read: false 
       });
+      
       setMeetingTitle('');
       setMeetingDate('');
       setMeetingTime('');
       setShowScheduleMeeting(false);
       alert('Meeting scheduled successfully!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error scheduling meeting:', error);
-      alert('Failed to schedule meeting. Check console for details.');
+      console.error('Error details:', error.message);
+      console.error('Error stack:', error.stack);
+      alert(`Failed to schedule meeting: ${error.message || 'Unknown error'}. Check console for details.`);
     }
   };
 
