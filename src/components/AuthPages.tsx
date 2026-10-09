@@ -9,9 +9,11 @@ export default function AuthPages() {
 
   // If already logged in and trying to access auth pages, redirect
   useEffect(() => {
-    if (auth.isAuthenticated() && (path === '/login' || path === '/signup')) {
-      // Already logged in, stay on auth page but user can re-login
-    }
+    auth.isAuthenticated().then(isAuth => {
+      if (isAuth && (path === '/login' || path === '/signup')) {
+        // Already logged in, stay on auth page but user can re-login
+      }
+    });
   }, [path]);
 
   if (path.includes('/signup')) return <SignupPage />;
@@ -61,12 +63,12 @@ function SignupPage() {
     setStep(3);
   };
 
-  const handleStep3 = (e: React.FormEvent) => {
+  const handleStep3 = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    const result = auth.signup(
+    const result = await auth.signup(
       formData.name,
       formData.email,
       formData.password,
@@ -336,12 +338,12 @@ function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    const result = auth.login(email, password);
+    const result = await auth.login(email, password);
     setLoading(false);
 
     if (result.success) {
@@ -435,16 +437,17 @@ function LoginPage() {
             <p className="text-xs font-medium mb-2" style={{ color: '#9a3412' }}>🎯 Try the demo</p>
             <button
               type="button"
-              onClick={() => {
-                // Create demo account if it doesn't exist
-                const users = auth.getUsers();
-                const demoUser = users.find(u => u.email === 'demo@clienttap.io');
-                if (demoUser) {
-                  const result = auth.login('demo@clienttap.io', 'demo1234');
-                  if (result.success) navigate('/app/dashboard');
+              onClick={async () => {
+                // Try to login with demo credentials
+                const result = await auth.login('demo@clienttap.io', 'demo1234');
+                if (result.success) {
+                  navigate('/app/dashboard');
                 } else {
-                  const result = auth.signup('Demo User', 'demo@clienttap.io', 'demo1234', 'Demo Agency', 'demo', 'IN');
-                  if (result.success) navigate('/app/dashboard');
+                  // If login fails, create demo account
+                  const signupResult = await auth.signup('Demo User', 'demo@clienttap.io', 'demo1234', 'Demo Agency', 'demo', 'IN');
+                  if (signupResult.success) {
+                    navigate('/app/dashboard');
+                  }
                 }
               }}
               className="w-full py-2 rounded-lg text-sm font-medium transition hover:opacity-90"

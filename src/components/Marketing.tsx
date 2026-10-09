@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../App';
 import { auth } from '../lib/auth';
@@ -22,6 +22,11 @@ export default function MarketingSite() {
     return !accepted;
   });
   const [journeyStep, setJourneyStep] = useState(0);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    auth.isAuthenticated().then(setIsAuthenticated);
+  }, []);
 
   const handleAcceptCookies = () => {
     localStorage.setItem('clienttap-cookies-accepted', 'true');
@@ -76,7 +81,7 @@ export default function MarketingSite() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              {auth.isAuthenticated() ? (
+              {isAuthenticated ? (
                 <>
                   <button onClick={() => navigate('/app/dashboard')} className="hidden sm:block text-sm font-medium transition hover:text-orange-600" style={{ color: '#78716C' }}>Go to app</button>
                   <button onClick={() => navigate('/app/dashboard')} className="btn-primary text-sm !py-2 !px-4">Dashboard</button>

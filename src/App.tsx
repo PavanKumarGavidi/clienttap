@@ -30,8 +30,17 @@ export const useApp = () => useContext(AppContext);
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const location = useLocation();
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    auth.isAuthenticated().then(setIsAuthenticated);
+  }, []);
+
+  if (isAuthenticated === null) {
+    return <div>Loading...</div>;
+  }
   
-  if (!auth.isAuthenticated()) {
+  if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
   
@@ -40,7 +49,17 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 // Public route wrapper - redirects to app if already logged in
 function PublicRoute({ children }: { children: React.ReactNode }) {
-  if (auth.isAuthenticated()) {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    auth.isAuthenticated().then(setIsAuthenticated);
+  }, []);
+
+  if (isAuthenticated === null) {
+    return <div>Loading...</div>;
+  }
+
+  if (isAuthenticated) {
     return <Navigate to="/app/dashboard" replace />;
   }
   return <>{children}</>;

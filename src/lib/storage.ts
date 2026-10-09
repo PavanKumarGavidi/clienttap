@@ -1,5 +1,4 @@
-// Data storage service - workspace-scoped, structured for Supabase swap-in
-import { leads, clients, projects, invoices, payments, tasks, messages, meetings, documents, notifications, expenses, retainers, reviews } from '../data/mockData';
+import { supabase } from './supabase';
 
 export interface WorkspaceData {
   leads: any[];
@@ -17,84 +16,127 @@ export interface WorkspaceData {
   reviews: any[];
 }
 
-function getDataKey(workspaceId: string): string {
-  return `clienttap_data_${workspaceId}`;
-}
-
 export const storage = {
   // Get all data for a workspace
-  getData(workspaceId: string): WorkspaceData {
-    const key = getDataKey(workspaceId);
-    const data = localStorage.getItem(key);
-    if (data) {
-      return JSON.parse(data);
+  async getData(workspaceId: string): Promise<WorkspaceData> {
+    try {
+      // Fetch all data in parallel
+      const [
+        { data: leads },
+        { data: clients },
+        { data: projects },
+        { data: invoices },
+        { data: payments },
+        { data: tasks },
+        { data: messages },
+        { data: meetings },
+        { data: documents },
+        { data: notifications },
+        { data: expenses },
+        { data: retainers },
+        { data: reviews }
+      ] = await Promise.all([
+        supabase.from('leads').select('*').eq('workspace_id', workspaceId).eq('deleted_at', null),
+        supabase.from('clients').select('*').eq('workspace_id', workspaceId).eq('deleted_at', null),
+        supabase.from('projects').select('*').eq('workspace_id', workspaceId).eq('deleted_at', null),
+        supabase.from('invoices').select('*').eq('workspace_id', workspaceId),
+        supabase.from('payments').select('*').eq('workspace_id', workspaceId),
+        supabase.from('tasks').select('*').eq('workspace_id', workspaceId),
+        supabase.from('messages').select('*').eq('workspace_id', workspaceId),
+        supabase.from('meetings').select('*').eq('workspace_id', workspaceId),
+        supabase.from('documents').select('*').eq('workspace_id', workspaceId),
+        supabase.from('notifications').select('*').eq('workspace_id', workspaceId),
+        supabase.from('expenses').select('*').eq('workspace_id', workspaceId),
+        supabase.from('retainers').select('*').eq('workspace_id', workspaceId),
+        supabase.from('reviews').select('*').eq('workspace_id', workspaceId)
+      ]);
+
+      return {
+        leads: leads || [],
+        clients: clients || [],
+        projects: projects || [],
+        invoices: invoices || [],
+        payments: payments || [],
+        tasks: tasks || [],
+        messages: messages || [],
+        meetings: meetings || [],
+        documents: documents || [],
+        notifications: notifications || [],
+        expenses: expenses || [],
+        retainers: retainers || [],
+        reviews: reviews || []
+      };
+    } catch (error) {
+      console.error('Error fetching workspace data:', error);
+      return {
+        leads: [],
+        clients: [],
+        projects: [],
+        invoices: [],
+        payments: [],
+        tasks: [],
+        messages: [],
+        meetings: [],
+        documents: [],
+        notifications: [],
+        expenses: [],
+        retainers: [],
+        reviews: []
+      };
     }
-    // Return seed data for first-time workspace
-    return {
-      leads: [...leads],
-      clients: [...clients],
-      projects: [...projects],
-      invoices: [...invoices],
-      payments: [...payments],
-      tasks: [...tasks],
-      messages: [...messages],
-      meetings: [...meetings],
-      documents: [...documents],
-      notifications: [...notifications],
-      expenses: [...expenses],
-      retainers: [...retainers],
-      reviews: [...reviews],
-    };
-  },
-
-  // Save all data for a workspace
-  saveData(workspaceId: string, data: WorkspaceData): void {
-    const key = getDataKey(workspaceId);
-    localStorage.setItem(key, JSON.stringify(data));
-  },
-
-  // Update a specific collection
-  updateCollection<K extends keyof WorkspaceData>(
-    workspaceId: string,
-    collection: K,
-    updater: (items: WorkspaceData[K]) => WorkspaceData[K]
-  ): WorkspaceData[K] {
-    const data = this.getData(workspaceId);
-    data[collection] = updater(data[collection]);
-    this.saveData(workspaceId, data);
-    return data[collection];
   },
 
   // Add item to collection
-  addItem<K extends keyof WorkspaceData>(
+  async addItem<K extends keyof WorkspaceData>(
     workspaceId: string,
     collection: K,
     item: any
-  ): void {
-    this.updateCollection(workspaceId, collection, (items: any[]) => [...items, item]);
+  ): Promise<void> {
+    const { error } = await supabase
+      .from(collection)
+      .insert({ ...item, workspace_id: workspaceId });
+    
+    if (error) {
+      console.error(`Error adding ${collection}:`, error);
+      throw error;
+    }
   },
 
   // Update item in collection
-  updateItem<K extends keyof WorkspaceData>(
+  async updateItem<K extends keyof WorkspaceData>(
     workspaceId: string,
     collection: K,
     id: string,
     updates: Partial<any>
-  ): void {
-    this.updateCollection(workspaceId, collection, (items: any[]) =>
-      items.map((item: any) => item.id === id ? { ...item, ...updates } : item)
-    );
+  ): Promise<void> {
+    const { error } = await supabase
+      .from(collection)
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .eq('workspace_id', workspaceId);
+    
+    if (error) {
+      console.error(`Error updating ${collection}:`, error);
+      throw error;
+    }
   },
 
-  // Delete item from collection
-  deleteItem<K extends keyof WorkspaceData>(
+  // Delete item from collection (soft delete)
+  async deleteItem<K extends keyof WorkspaceData>(
     workspaceId: string,
     collection: K,
     id: string
-  ): void {
-    this.updateCollection(workspaceId, collection, (items: any[]) =>
-      items.filter((item: any) => item.id !== id)
-    );
+  ): Promise<void> {
+    const { error } = await supabase
+      .from(collection)
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('id', id)
+      .eq('workspace_id', workspaceId);
+    
+    if (error) {
+      console.error(`Error deleting ${collection}:`, error);
+      throw error;
+    }
   },
 
   // Generate unique ID
@@ -103,8 +145,18 @@ export const storage = {
   },
 
   // Clear workspace data (for testing)
-  clearData(workspaceId: string): void {
-    const key = getDataKey(workspaceId);
-    localStorage.removeItem(key);
-  },
+  async clearData(workspaceId: string): Promise<void> {
+    const tables: (keyof WorkspaceData)[] = [
+      'leads', 'clients', 'projects', 'invoices', 'payments',
+      'tasks', 'messages', 'meetings', 'documents', 'notifications',
+      'expenses', 'retainers', 'reviews'
+    ];
+
+    for (const table of tables) {
+      await supabase
+        .from(table)
+        .delete()
+        .eq('workspace_id', workspaceId);
+    }
+  }
 };

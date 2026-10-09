@@ -7,6 +7,7 @@ interface Store {
   // Current user & workspace
   currentUser: any;
   currentWorkspace: any;
+  loading: boolean;
   
   // Data
   leads: any[];
@@ -32,114 +33,188 @@ interface Store {
   plans: any;
   
   // Lead actions
-  addLead: (lead: any) => void;
-  updateLead: (id: string, updates: any) => void;
-  deleteLead: (id: string) => void;
-  moveLeadToStage: (id: string, stage: string) => void;
-  convertLeadToClient: (id: string) => void;
+  addLead: (lead: any) => Promise<void>;
+  updateLead: (id: string, updates: any) => Promise<void>;
+  deleteLead: (id: string) => Promise<void>;
+  moveLeadToStage: (id: string, stage: string) => Promise<void>;
+  convertLeadToClient: (id: string) => Promise<void>;
   
   // Client actions
-  addClient: (client: any) => void;
-  updateClient: (id: string, updates: any) => void;
+  addClient: (client: any) => Promise<void>;
+  updateClient: (id: string, updates: any) => Promise<void>;
   
   // Project actions
-  addProject: (project: any) => void;
-  updateProject: (id: string, updates: any) => void;
+  addProject: (project: any) => Promise<void>;
+  updateProject: (id: string, updates: any) => Promise<void>;
   
   // Invoice actions
-  addInvoice: (invoice: any) => void;
+  addInvoice: (invoice: any) => Promise<void>;
   
   // Retainer actions
-  addRetainer: (retainer: any) => void;
-  updateRetainer: (id: string, updates: any) => void;
-  deleteRetainer: (id: string) => void;
+  addRetainer: (retainer: any) => Promise<void>;
+  updateRetainer: (id: string, updates: any) => Promise<void>;
+  deleteRetainer: (id: string) => Promise<void>;
   
   // Payment actions
-  addPayment: (payment: any) => void;
+  addPayment: (payment: any) => Promise<void>;
   
   // Task actions
-  addTask: (task: any) => void;
-  updateTask: (id: string, updates: any) => void;
+  addTask: (task: any) => Promise<void>;
+  updateTask: (id: string, updates: any) => Promise<void>;
   
   // Message actions
-  addMessage: (msg: any) => void;
+  addMessage: (msg: any) => Promise<void>;
   
   // Meeting actions
-  addMeeting: (meeting: any) => void;
+  addMeeting: (meeting: any) => Promise<void>;
   
   // Document actions
-  addDocument: (doc: any) => void;
+  addDocument: (doc: any) => Promise<void>;
   
   // Notification actions
-  addNotification: (n: any) => void;
-  markNotificationRead: (id: string) => void;
-  markAllNotificationsRead: () => void;
+  addNotification: (n: any) => Promise<void>;
+  markNotificationRead: (id: string) => Promise<void>;
+  markAllNotificationsRead: () => Promise<void>;
   
   // Auth actions
-  logout: () => void;
-  updateProfile: (updates: any) => void;
-  updateWorkspace: (updates: any) => void;
+  logout: () => Promise<void>;
+  updateProfile: (updates: any) => Promise<void>;
+  updateWorkspace: (updates: any) => Promise<void>;
   
   // Refresh data from storage
-  refresh: () => void;
+  refresh: () => Promise<void>;
 }
 
 const StoreContext = createContext<Store | null>(null);
 
 export function StoreProvider({ children }: { children: ReactNode }) {
-  const [currentUser, setCurrentUser] = useState<any>(auth.getCurrentUser());
-  const [currentWorkspace, setCurrentWorkspace] = useState<any>(auth.getCurrentWorkspace());
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [currentWorkspace, setCurrentWorkspace] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  
+  const [leads, setLeads] = useState<any[]>([]);
+  const [clients, setClients] = useState<any[]>([]);
+  const [projects, setProjects] = useState<any[]>([]);
+  const [invoices, setInvoices] = useState<any[]>([]);
+  const [payments, setPayments] = useState<any[]>([]);
+  const [tasks, setTasks] = useState<any[]>([]);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [meetings, setMeetings] = useState<any[]>([]);
+  const [documents, setDocuments] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [expenses, setExpenses] = useState<any[]>([]);
+  const [retainers, setRetainers] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
+
+  // Load user, workspace, and data on mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const user = await auth.getCurrentUser();
+        const workspace = await auth.getCurrentWorkspace();
+        
+        setCurrentUser(user);
+        setCurrentWorkspace(workspace);
+        
+        if (workspace) {
+          const data = await storage.getData(workspace.id);
+          setLeads(data.leads);
+          setClients(data.clients);
+          setProjects(data.projects);
+          setInvoices(data.invoices);
+          setPayments(data.payments);
+          setTasks(data.tasks);
+          setMessages(data.messages);
+          setMeetings(data.meetings);
+          setDocuments(data.documents);
+          setNotifications(data.notifications);
+          setExpenses(data.expenses);
+          setRetainers(data.retainers);
+          setReviews(data.reviews);
+        }
+      } catch (error) {
+        console.error('Error loading data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadData();
+  }, []);
   
   const getWorkspaceId = useCallback(() => {
-    return currentWorkspace?.id || 'default';
+    return currentWorkspace?.id || '';
   }, [currentWorkspace]);
   
-  // Load data from storage
-  const [data, setData] = useState(() => storage.getData(getWorkspaceId()));
-  
   // Refresh data from storage
-  const refresh = useCallback(() => {
-    setData(storage.getData(getWorkspaceId()));
-    setCurrentUser(auth.getCurrentUser());
-    setCurrentWorkspace(auth.getCurrentWorkspace());
-  }, [getWorkspaceId]);
-  
-  // Persist helper
-  const persist = useCallback((newData: any) => {
-    storage.saveData(getWorkspaceId(), newData);
-    setData(newData);
-  }, [getWorkspaceId]);
+  const refresh = useCallback(async () => {
+    const user = await auth.getCurrentUser();
+    const workspace = await auth.getCurrentWorkspace();
+    
+    setCurrentUser(user);
+    setCurrentWorkspace(workspace);
+    
+    if (workspace) {
+      const data = await storage.getData(workspace.id);
+      setLeads(data.leads);
+      setClients(data.clients);
+      setProjects(data.projects);
+      setInvoices(data.invoices);
+      setPayments(data.payments);
+      setTasks(data.tasks);
+      setMessages(data.messages);
+      setMeetings(data.meetings);
+      setDocuments(data.documents);
+      setNotifications(data.notifications);
+      setExpenses(data.expenses);
+      setRetainers(data.retainers);
+      setReviews(data.reviews);
+    }
+  }, []);
   
   // ID generator
   const genId = (prefix: string) => storage.genId(prefix);
   
   // Lead actions
-  const addLead = (lead: any) => {
-    const newLead = { ...lead, id: genId('l') };
-    const newData = { ...data, leads: [...data.leads, newLead] };
-    persist(newData);
+  const addLead = async (lead: any) => {
+    const workspaceId = getWorkspaceId();
+    if (!workspaceId) return;
+    
+    const newLead = { ...lead, id: genId('l'), workspace_id: workspaceId };
+    await storage.addItem(workspaceId, 'leads', newLead);
+    setLeads(prev => [...prev, newLead]);
   };
   
-  const updateLead = (id: string, updates: any) => {
-    const newData = { ...data, leads: data.leads.map((l: any) => l.id === id ? { ...l, ...updates } : l) };
-    persist(newData);
+  const updateLead = async (id: string, updates: any) => {
+    const workspaceId = getWorkspaceId();
+    if (!workspaceId) return;
+    
+    await storage.updateItem(workspaceId, 'leads', id, updates);
+    setLeads(prev => prev.map(l => l.id === id ? { ...l, ...updates } : l));
   };
   
-  const deleteLead = (id: string) => {
-    const newData = { ...data, leads: data.leads.filter((l: any) => l.id !== id) };
-    persist(newData);
+  const deleteLead = async (id: string) => {
+    const workspaceId = getWorkspaceId();
+    if (!workspaceId) return;
+    
+    await storage.deleteItem(workspaceId, 'leads', id);
+    setLeads(prev => prev.filter(l => l.id !== id));
   };
   
-  const moveLeadToStage = (id: string, stage: string) => {
-    updateLead(id, { stage });
+  const moveLeadToStage = async (id: string, stage: string) => {
+    await updateLead(id, { stage });
   };
   
-  const convertLeadToClient = (id: string) => {
-    const lead = data.leads.find((l: any) => l.id === id);
+  const convertLeadToClient = async (id: string) => {
+    const lead = leads.find(l => l.id === id);
     if (!lead) return;
+    
+    const workspaceId = getWorkspaceId();
+    if (!workspaceId) return;
     
     const newClient = {
       id: genId('c'),
+      workspace_id: workspaceId,
       name: lead.name,
       company: lead.company,
       email: lead.email,
@@ -147,164 +222,236 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       address: '',
       gstin: '',
       currency: lead.currency,
-      currencySymbol: lead.currency === 'USD' ? '$' : '₹',
-      owner: lead.assignedTo,
-      portalEnabled: false,
-      totalProjects: 0,
-      totalInvoiced: 0,
-      totalPaid: 0,
+      currency_symbol: lead.currency === 'USD' ? '$' : '₹',
+      owner_id: lead.assigned_to,
+      portal_enabled: false,
+      total_projects: 0,
+      total_invoiced: 0,
+      total_paid: 0,
       outstanding: 0,
-      since: new Date().toISOString().split('T')[0],
+      since: new Date().toISOString().split('T')[0]
     };
     
-    const newData = {
-      ...data,
-      clients: [...data.clients, newClient],
-      leads: data.leads.map((l: any) => l.id === id ? { ...l, stage: 's5', wonDate: new Date().toISOString().split('T')[0] } : l),
-    };
-    persist(newData);
+    await storage.addItem(workspaceId, 'clients', newClient);
+    setClients(prev => [...prev, newClient]);
+    await updateLead(id, { stage: 's5', won_date: new Date().toISOString().split('T')[0] });
   };
   
   // Client actions
-  const addClient = (client: any) => {
-    const newClient = { ...client, id: genId('c') };
-    const newData = { ...data, clients: [...data.clients, newClient] };
-    persist(newData);
+  const addClient = async (client: any) => {
+    const workspaceId = getWorkspaceId();
+    if (!workspaceId) return;
+    
+    const newClient = { ...client, id: genId('c'), workspace_id: workspaceId };
+    await storage.addItem(workspaceId, 'clients', newClient);
+    setClients(prev => [...prev, newClient]);
   };
   
-  const updateClient = (id: string, updates: any) => {
-    const newData = { ...data, clients: data.clients.map((c: any) => c.id === id ? { ...c, ...updates } : c) };
-    persist(newData);
+  const updateClient = async (id: string, updates: any) => {
+    const workspaceId = getWorkspaceId();
+    if (!workspaceId) return;
+    
+    await storage.updateItem(workspaceId, 'clients', id, updates);
+    setClients(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c));
   };
   
   // Project actions
-  const addProject = (project: any) => {
-    const newProject = { ...project, id: genId('p') };
-    const newData = { ...data, projects: [...data.projects, newProject] };
-    persist(newData);
+  const addProject = async (project: any) => {
+    const workspaceId = getWorkspaceId();
+    if (!workspaceId) return;
+    
+    const newProject = { ...project, id: genId('p'), workspace_id: workspaceId };
+    await storage.addItem(workspaceId, 'projects', newProject);
+    setProjects(prev => [...prev, newProject]);
   };
   
-  const updateProject = (id: string, updates: any) => {
-    const newData = { ...data, projects: data.projects.map((p: any) => p.id === id ? { ...p, ...updates } : p) };
-    persist(newData);
+  const updateProject = async (id: string, updates: any) => {
+    const workspaceId = getWorkspaceId();
+    if (!workspaceId) return;
+    
+    await storage.updateItem(workspaceId, 'projects', id, updates);
+    setProjects(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
   };
   
   // Invoice actions
-  const addInvoice = (invoice: any) => {
-    const newInvoice = { ...invoice, id: genId('inv') };
-    const newData = { ...data, invoices: [...data.invoices, newInvoice] };
-    persist(newData);
+  const addInvoice = async (invoice: any) => {
+    const workspaceId = getWorkspaceId();
+    if (!workspaceId) return;
+    
+    const newInvoice = { ...invoice, id: genId('inv'), workspace_id: workspaceId };
+    await storage.addItem(workspaceId, 'invoices', newInvoice);
+    setInvoices(prev => [...prev, newInvoice]);
   };
   
   // Retainer actions
-  const addRetainer = (retainer: any) => {
-    const newRetainer = { ...retainer, id: genId('ret') };
-    const newData = { ...data, retainers: [...data.retainers, newRetainer] };
-    persist(newData);
+  const addRetainer = async (retainer: any) => {
+    const workspaceId = getWorkspaceId();
+    if (!workspaceId) return;
+    
+    const newRetainer = { ...retainer, id: genId('ret'), workspace_id: workspaceId };
+    await storage.addItem(workspaceId, 'retainers', newRetainer);
+    setRetainers(prev => [...prev, newRetainer]);
   };
   
-  const updateRetainer = (id: string, updates: any) => {
-    const newData = { ...data, retainers: data.retainers.map((r: any) => r.id === id ? { ...r, ...updates } : r) };
-    persist(newData);
+  const updateRetainer = async (id: string, updates: any) => {
+    const workspaceId = getWorkspaceId();
+    if (!workspaceId) return;
+    
+    await storage.updateItem(workspaceId, 'retainers', id, updates);
+    setRetainers(prev => prev.map(r => r.id === id ? { ...r, ...updates } : r));
   };
   
-  const deleteRetainer = (id: string) => {
-    const newData = { ...data, retainers: data.retainers.filter((r: any) => r.id !== id) };
-    persist(newData);
+  const deleteRetainer = async (id: string) => {
+    const workspaceId = getWorkspaceId();
+    if (!workspaceId) return;
+    
+    await storage.deleteItem(workspaceId, 'retainers', id);
+    setRetainers(prev => prev.filter(r => r.id !== id));
   };
   
   // Payment actions
-  const addPayment = (payment: any) => {
-    const newPayment = { ...payment, id: genId('pay') };
-    const newData = { ...data, payments: [...data.payments, newPayment] };
-    persist(newData);
+  const addPayment = async (payment: any) => {
+    const workspaceId = getWorkspaceId();
+    if (!workspaceId) return;
+    
+    const newPayment = { ...payment, id: genId('pay'), workspace_id: workspaceId };
+    await storage.addItem(workspaceId, 'payments', newPayment);
+    setPayments(prev => [...prev, newPayment]);
   };
   
   // Task actions
-  const addTask = (task: any) => {
-    const newTask = { ...task, id: genId('t') };
-    const newData = { ...data, tasks: [...data.tasks, newTask] };
-    persist(newData);
+  const addTask = async (task: any) => {
+    const workspaceId = getWorkspaceId();
+    if (!workspaceId) return;
+    
+    const newTask = { ...task, id: genId('t'), workspace_id: workspaceId };
+    await storage.addItem(workspaceId, 'tasks', newTask);
+    setTasks(prev => [...prev, newTask]);
   };
   
-  const updateTask = (id: string, updates: any) => {
-    const newData = { ...data, tasks: data.tasks.map((t: any) => t.id === id ? { ...t, ...updates } : t) };
-    persist(newData);
+  const updateTask = async (id: string, updates: any) => {
+    const workspaceId = getWorkspaceId();
+    if (!workspaceId) return;
+    
+    await storage.updateItem(workspaceId, 'tasks', id, updates);
+    setTasks(prev => prev.map(t => t.id === id ? { ...t, ...updates } : t));
   };
   
   // Message actions
-  const addMessage = (msg: any) => {
-    const newMsg = { ...msg, id: genId('msg') };
-    const newData = { ...data, messages: [...data.messages, newMsg] };
-    persist(newData);
+  const addMessage = async (msg: any) => {
+    const workspaceId = getWorkspaceId();
+    if (!workspaceId) return;
+    
+    const newMsg = { ...msg, id: genId('msg'), workspace_id: workspaceId };
+    await storage.addItem(workspaceId, 'messages', newMsg);
+    setMessages(prev => [...prev, newMsg]);
   };
   
   // Meeting actions
-  const addMeeting = (meeting: any) => {
-    const newMeeting = { ...meeting, id: genId('m') };
-    const newData = { ...data, meetings: [...data.meetings, newMeeting] };
-    persist(newData);
+  const addMeeting = async (meeting: any) => {
+    const workspaceId = getWorkspaceId();
+    if (!workspaceId) return;
+    
+    const newMeeting = { ...meeting, id: genId('m'), workspace_id: workspaceId };
+    await storage.addItem(workspaceId, 'meetings', newMeeting);
+    setMeetings(prev => [...prev, newMeeting]);
   };
   
   // Document actions
-  const addDocument = (doc: any) => {
-    const newDoc = { ...doc, id: genId('d') };
-    const newData = { ...data, documents: [...data.documents, newDoc] };
-    persist(newData);
+  const addDocument = async (doc: any) => {
+    const workspaceId = getWorkspaceId();
+    if (!workspaceId) return;
+    
+    const newDoc = { ...doc, id: genId('d'), workspace_id: workspaceId };
+    await storage.addItem(workspaceId, 'documents', newDoc);
+    setDocuments(prev => [...prev, newDoc]);
   };
   
   // Notification actions
-  const addNotification = (n: any) => {
-    const newN = { ...n, id: genId('n'), time: n.time || 'Just now' };
-    const newData = { ...data, notifications: [newN, ...data.notifications] };
-    persist(newData);
+  const addNotification = async (n: any) => {
+    const workspaceId = getWorkspaceId();
+    if (!workspaceId) return;
+    
+    const newN = { ...n, id: genId('n'), workspace_id: workspaceId, time: n.time || 'Just now' };
+    await storage.addItem(workspaceId, 'notifications', newN);
+    setNotifications(prev => [newN, ...prev]);
   };
   
-  const markNotificationRead = (id: string) => {
-    const newData = { ...data, notifications: data.notifications.map((n: any) => n.id === id ? { ...n, read: true } : n) };
-    persist(newData);
+  const markNotificationRead = async (id: string) => {
+    const workspaceId = getWorkspaceId();
+    if (!workspaceId) return;
+    
+    await storage.updateItem(workspaceId, 'notifications', id, { read: true });
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
   };
   
-  const markAllNotificationsRead = () => {
-    const newData = { ...data, notifications: data.notifications.map((n: any) => ({ ...n, read: true })) };
-    persist(newData);
+  const markAllNotificationsRead = async () => {
+    const workspaceId = getWorkspaceId();
+    if (!workspaceId) return;
+    
+    for (const n of notifications) {
+      if (!n.read) {
+        await storage.updateItem(workspaceId, 'notifications', n.id, { read: true });
+      }
+    }
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
   };
   
   // Auth actions
-  const logout = () => {
-    auth.logout();
+  const logout = async () => {
+    await auth.logout();
     setCurrentUser(null);
     setCurrentWorkspace(null);
+    setLeads([]);
+    setClients([]);
+    setProjects([]);
+    setInvoices([]);
+    setPayments([]);
+    setTasks([]);
+    setMessages([]);
+    setMeetings([]);
+    setDocuments([]);
+    setNotifications([]);
+    setExpenses([]);
+    setRetainers([]);
+    setReviews([]);
   };
   
-  const updateProfile = (updates: any) => {
+  const updateProfile = async (updates: any) => {
     if (!currentUser) return;
-    auth.updateUser(currentUser.id, updates);
-    setCurrentUser(auth.getCurrentUser());
+    await auth.updateProfile(currentUser.id, updates);
+    const user = await auth.getCurrentUser();
+    setCurrentUser(user);
   };
   
-  const updateWorkspace = (updates: any) => {
+  const updateWorkspace = async (updates: any) => {
     if (!currentWorkspace) return;
-    auth.updateWorkspace(currentWorkspace.id, updates);
-    setCurrentWorkspace(auth.getCurrentWorkspace());
+    await auth.updateWorkspace(currentWorkspace.id, updates);
+    const workspace = await auth.getCurrentWorkspace();
+    setCurrentWorkspace(workspace);
   };
+  
+  if (loading) {
+    return <div>Loading...</div>;
+  }
   
   const store: Store = {
     currentUser,
     currentWorkspace,
-    leads: data.leads,
-    clients: data.clients,
-    projects: data.projects,
-    invoices: data.invoices,
-    payments: data.payments,
-    tasks: data.tasks,
-    messages: data.messages,
-    meetings: data.meetings,
-    documents: data.documents,
-    notifications: data.notifications,
-    expenses: data.expenses,
-    retainers: data.retainers,
-    reviews: data.reviews,
+    loading,
+    leads,
+    clients,
+    projects,
+    invoices,
+    payments,
+    tasks,
+    messages,
+    meetings,
+    documents,
+    notifications,
+    expenses,
+    retainers,
+    reviews,
     teamMembers,
     pipelineStages,
     revenueData,
