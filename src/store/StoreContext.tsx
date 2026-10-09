@@ -178,11 +178,27 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   // Lead actions
   const addLead = async (lead: any) => {
     const workspaceId = getWorkspaceId();
-    if (!workspaceId) return;
+    if (!workspaceId) {
+      console.error('Cannot add lead: no workspace ID');
+      throw new Error('No workspace ID available');
+    }
     
+    console.log('Adding lead with workspace ID:', workspaceId);
     const newLead = { ...lead, id: genId('l'), workspace_id: workspaceId };
-    await storage.addItem(workspaceId, 'leads', newLead);
-    setLeads(prev => [...prev, newLead]);
+    console.log('New lead data:', newLead);
+    
+    try {
+      await storage.addItem(workspaceId, 'leads', newLead);
+      console.log('Lead added to Supabase successfully');
+      
+      // Refresh data from Supabase to ensure consistency
+      const data = await storage.getData(workspaceId);
+      setLeads(data.leads);
+      console.log('Leads refreshed from Supabase:', data.leads.length, 'leads');
+    } catch (error) {
+      console.error('Error in addLead:', error);
+      throw error;
+    }
   };
   
   const updateLead = async (id: string, updates: any) => {
@@ -242,14 +258,25 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     const workspaceId = getWorkspaceId();
     if (!workspaceId) {
       console.error('Cannot add client: no workspace ID');
-      return;
+      throw new Error('No workspace ID available');
     }
     
-    console.log('Adding client to workspace:', workspaceId, client);
+    console.log('Adding client with workspace ID:', workspaceId);
     const newClient = { ...client, id: genId('c'), workspace_id: workspaceId };
-    await storage.addItem(workspaceId, 'clients', newClient);
-    console.log('Client added to state');
-    setClients(prev => [...prev, newClient]);
+    console.log('New client data:', newClient);
+    
+    try {
+      await storage.addItem(workspaceId, 'clients', newClient);
+      console.log('Client added to Supabase successfully');
+      
+      // Refresh data from Supabase
+      const data = await storage.getData(workspaceId);
+      setClients(data.clients);
+      console.log('Clients refreshed from Supabase:', data.clients.length, 'clients');
+    } catch (error) {
+      console.error('Error in addClient:', error);
+      throw error;
+    }
   };
   
   const updateClient = async (id: string, updates: any) => {
@@ -263,11 +290,27 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   // Project actions
   const addProject = async (project: any) => {
     const workspaceId = getWorkspaceId();
-    if (!workspaceId) return;
+    if (!workspaceId) {
+      console.error('Cannot add project: no workspace ID');
+      throw new Error('No workspace ID available');
+    }
     
+    console.log('Adding project with workspace ID:', workspaceId);
     const newProject = { ...project, id: genId('p'), workspace_id: workspaceId };
-    await storage.addItem(workspaceId, 'projects', newProject);
-    setProjects(prev => [...prev, newProject]);
+    console.log('New project data:', newProject);
+    
+    try {
+      await storage.addItem(workspaceId, 'projects', newProject);
+      console.log('Project added to Supabase successfully');
+      
+      // Refresh data from Supabase
+      const data = await storage.getData(workspaceId);
+      setProjects(data.projects);
+      console.log('Projects refreshed from Supabase:', data.projects.length, 'projects');
+    } catch (error) {
+      console.error('Error in addProject:', error);
+      throw error;
+    }
   };
   
   const updateProject = async (id: string, updates: any) => {
@@ -281,21 +324,53 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   // Invoice actions
   const addInvoice = async (invoice: any) => {
     const workspaceId = getWorkspaceId();
-    if (!workspaceId) return;
+    if (!workspaceId) {
+      console.error('Cannot add invoice: no workspace ID');
+      throw new Error('No workspace ID available');
+    }
     
+    console.log('Adding invoice with workspace ID:', workspaceId);
     const newInvoice = { ...invoice, id: genId('inv'), workspace_id: workspaceId };
-    await storage.addItem(workspaceId, 'invoices', newInvoice);
-    setInvoices(prev => [...prev, newInvoice]);
+    console.log('New invoice data:', newInvoice);
+    
+    try {
+      await storage.addItem(workspaceId, 'invoices', newInvoice);
+      console.log('Invoice added to Supabase successfully');
+      
+      // Refresh data from Supabase
+      const data = await storage.getData(workspaceId);
+      setInvoices(data.invoices);
+      console.log('Invoices refreshed from Supabase:', data.invoices.length, 'invoices');
+    } catch (error) {
+      console.error('Error in addInvoice:', error);
+      throw error;
+    }
   };
   
   // Retainer actions
   const addRetainer = async (retainer: any) => {
     const workspaceId = getWorkspaceId();
-    if (!workspaceId) return;
+    if (!workspaceId) {
+      console.error('Cannot add retainer: no workspace ID');
+      throw new Error('No workspace ID available');
+    }
     
+    console.log('Adding retainer with workspace ID:', workspaceId);
     const newRetainer = { ...retainer, id: genId('ret'), workspace_id: workspaceId };
-    await storage.addItem(workspaceId, 'retainers', newRetainer);
-    setRetainers(prev => [...prev, newRetainer]);
+    console.log('New retainer data:', newRetainer);
+    
+    try {
+      await storage.addItem(workspaceId, 'retainers', newRetainer);
+      console.log('Retainer added to Supabase successfully');
+      
+      // Refresh data from Supabase
+      const data = await storage.getData(workspaceId);
+      setRetainers(data.retainers);
+      console.log('Retainers refreshed from Supabase:', data.retainers.length, 'retainers');
+    } catch (error) {
+      console.error('Error in addRetainer:', error);
+      throw error;
+    }
   };
   
   const updateRetainer = async (id: string, updates: any) => {
@@ -317,21 +392,53 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   // Payment actions
   const addPayment = async (payment: any) => {
     const workspaceId = getWorkspaceId();
-    if (!workspaceId) return;
+    if (!workspaceId) {
+      console.error('Cannot add payment: no workspace ID');
+      throw new Error('No workspace ID available');
+    }
     
+    console.log('Adding payment with workspace ID:', workspaceId);
     const newPayment = { ...payment, id: genId('pay'), workspace_id: workspaceId };
-    await storage.addItem(workspaceId, 'payments', newPayment);
-    setPayments(prev => [...prev, newPayment]);
+    console.log('New payment data:', newPayment);
+    
+    try {
+      await storage.addItem(workspaceId, 'payments', newPayment);
+      console.log('Payment added to Supabase successfully');
+      
+      // Refresh data from Supabase
+      const data = await storage.getData(workspaceId);
+      setPayments(data.payments);
+      console.log('Payments refreshed from Supabase:', data.payments.length, 'payments');
+    } catch (error) {
+      console.error('Error in addPayment:', error);
+      throw error;
+    }
   };
   
   // Task actions
   const addTask = async (task: any) => {
     const workspaceId = getWorkspaceId();
-    if (!workspaceId) return;
+    if (!workspaceId) {
+      console.error('Cannot add task: no workspace ID');
+      throw new Error('No workspace ID available');
+    }
     
+    console.log('Adding task with workspace ID:', workspaceId);
     const newTask = { ...task, id: genId('t'), workspace_id: workspaceId };
-    await storage.addItem(workspaceId, 'tasks', newTask);
-    setTasks(prev => [...prev, newTask]);
+    console.log('New task data:', newTask);
+    
+    try {
+      await storage.addItem(workspaceId, 'tasks', newTask);
+      console.log('Task added to Supabase successfully');
+      
+      // Refresh data from Supabase
+      const data = await storage.getData(workspaceId);
+      setTasks(data.tasks);
+      console.log('Tasks refreshed from Supabase:', data.tasks.length, 'tasks');
+    } catch (error) {
+      console.error('Error in addTask:', error);
+      throw error;
+    }
   };
   
   const updateTask = async (id: string, updates: any) => {
@@ -345,11 +452,27 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   // Message actions
   const addMessage = async (msg: any) => {
     const workspaceId = getWorkspaceId();
-    if (!workspaceId) return;
+    if (!workspaceId) {
+      console.error('Cannot add message: no workspace ID');
+      throw new Error('No workspace ID available');
+    }
     
+    console.log('Adding message with workspace ID:', workspaceId);
     const newMsg = { ...msg, id: genId('msg'), workspace_id: workspaceId };
-    await storage.addItem(workspaceId, 'messages', newMsg);
-    setMessages(prev => [...prev, newMsg]);
+    console.log('New message data:', newMsg);
+    
+    try {
+      await storage.addItem(workspaceId, 'messages', newMsg);
+      console.log('Message added to Supabase successfully');
+      
+      // Refresh data from Supabase
+      const data = await storage.getData(workspaceId);
+      setMessages(data.messages);
+      console.log('Messages refreshed from Supabase:', data.messages.length, 'messages');
+    } catch (error) {
+      console.error('Error in addMessage:', error);
+      throw error;
+    }
   };
   
   // Meeting actions
@@ -357,34 +480,77 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     const workspaceId = getWorkspaceId();
     if (!workspaceId) {
       console.error('Cannot add meeting: no workspace ID');
-      return;
+      throw new Error('No workspace ID available');
     }
     
-    console.log('Adding meeting to workspace:', workspaceId, meeting);
+    console.log('Adding meeting with workspace ID:', workspaceId);
     const newMeeting = { ...meeting, id: genId('m'), workspace_id: workspaceId };
-    await storage.addItem(workspaceId, 'meetings', newMeeting);
-    console.log('Meeting added to state');
-    setMeetings(prev => [...prev, newMeeting]);
+    console.log('New meeting data:', newMeeting);
+    
+    try {
+      await storage.addItem(workspaceId, 'meetings', newMeeting);
+      console.log('Meeting added to Supabase successfully');
+      
+      // Refresh data from Supabase
+      const data = await storage.getData(workspaceId);
+      setMeetings(data.meetings);
+      console.log('Meetings refreshed from Supabase:', data.meetings.length, 'meetings');
+    } catch (error) {
+      console.error('Error in addMeeting:', error);
+      throw error;
+    }
   };
   
   // Document actions
   const addDocument = async (doc: any) => {
     const workspaceId = getWorkspaceId();
-    if (!workspaceId) return;
+    if (!workspaceId) {
+      console.error('Cannot add document: no workspace ID');
+      throw new Error('No workspace ID available');
+    }
     
+    console.log('Adding document with workspace ID:', workspaceId);
     const newDoc = { ...doc, id: genId('d'), workspace_id: workspaceId };
-    await storage.addItem(workspaceId, 'documents', newDoc);
-    setDocuments(prev => [...prev, newDoc]);
+    console.log('New document data:', newDoc);
+    
+    try {
+      await storage.addItem(workspaceId, 'documents', newDoc);
+      console.log('Document added to Supabase successfully');
+      
+      // Refresh data from Supabase
+      const data = await storage.getData(workspaceId);
+      setDocuments(data.documents);
+      console.log('Documents refreshed from Supabase:', data.documents.length, 'documents');
+    } catch (error) {
+      console.error('Error in addDocument:', error);
+      throw error;
+    }
   };
   
   // Notification actions
   const addNotification = async (n: any) => {
     const workspaceId = getWorkspaceId();
-    if (!workspaceId) return;
+    if (!workspaceId) {
+      console.error('Cannot add notification: no workspace ID');
+      throw new Error('No workspace ID available');
+    }
     
+    console.log('Adding notification with workspace ID:', workspaceId);
     const newN = { ...n, id: genId('n'), workspace_id: workspaceId, time: n.time || 'Just now' };
-    await storage.addItem(workspaceId, 'notifications', newN);
-    setNotifications(prev => [newN, ...prev]);
+    console.log('New notification data:', newN);
+    
+    try {
+      await storage.addItem(workspaceId, 'notifications', newN);
+      console.log('Notification added to Supabase successfully');
+      
+      // Refresh data from Supabase
+      const data = await storage.getData(workspaceId);
+      setNotifications(data.notifications);
+      console.log('Notifications refreshed from Supabase:', data.notifications.length, 'notifications');
+    } catch (error) {
+      console.error('Error in addNotification:', error);
+      throw error;
+    }
   };
   
   const markNotificationRead = async (id: string) => {
