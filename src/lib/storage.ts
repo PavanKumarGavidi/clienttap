@@ -111,18 +111,30 @@ export const storage = {
     workspaceId: string,
     collection: K,
     item: any
-  ): Promise<void> {
-    console.log(`Adding ${collection} to workspace ${workspaceId}:`, item);
+  ): Promise<any> {
+    console.log(`[Storage] Adding ${collection} to workspace ${workspaceId}`);
+    console.log('[Storage] Item data:', item);
+    
+    // Ensure all required fields are present
+    const dataToInsert = {
+      ...item,
+      workspace_id: workspaceId,
+    };
+    
     const { data, error } = await supabase
       .from(collection)
-      .insert({ ...item, workspace_id: workspaceId })
+      .insert([dataToInsert])
       .select();
     
     if (error) {
-      console.error(`Error adding ${collection}:`, error);
-      throw error;
+      console.error(`[Storage] Error adding ${collection}:`, error);
+      console.error('[Storage] Error details:', error.message);
+      console.error('[Storage] Error code:', error.code);
+      throw new Error(`Failed to add ${collection}: ${error.message}`);
     }
-    console.log(`${collection} added successfully:`, data);
+    
+    console.log(`[Storage] ${collection} added successfully:`, data);
+    return data;
   },
 
   // Update item in collection
