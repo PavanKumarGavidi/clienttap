@@ -10,6 +10,7 @@ import Leads from './pages/Leads';
 import Clients from './pages/Clients';
 import Projects from './pages/Projects';
 import Invoices from './pages/Invoices';
+import Retainers from './pages/Retainers';
 import Portal from './pages/Portal';
 import Settings from './pages/Settings';
 import OtherPages from './pages/OtherPages';
@@ -73,6 +74,7 @@ function AppContent() {
             <Route path="projects" element={<Projects />} />
             <Route path="invoices" element={<Invoices />} />
             <Route path="payments" element={<Invoices />} />
+            <Route path="retainers" element={<Retainers />} />
             <Route path="messages" element={<OtherPages page="messages" />} />
             <Route path="meetings" element={<OtherPages page="meetings" />} />
             <Route path="tasks" element={<OtherPages page="tasks" />} />

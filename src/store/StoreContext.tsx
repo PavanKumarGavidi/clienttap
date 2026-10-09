@@ -49,6 +49,11 @@ interface Store {
   // Invoice actions
   addInvoice: (invoice: any) => void;
   
+  // Retainer actions
+  addRetainer: (retainer: any) => void;
+  updateRetainer: (id: string, updates: any) => void;
+  deleteRetainer: (id: string) => void;
+  
   // Payment actions
   addPayment: (payment: any) => void;
   
@@ -191,6 +196,23 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     persist(newData);
   };
   
+  // Retainer actions
+  const addRetainer = (retainer: any) => {
+    const newRetainer = { ...retainer, id: genId('ret') };
+    const newData = { ...data, retainers: [...data.retainers, newRetainer] };
+    persist(newData);
+  };
+  
+  const updateRetainer = (id: string, updates: any) => {
+    const newData = { ...data, retainers: data.retainers.map((r: any) => r.id === id ? { ...r, ...updates } : r) };
+    persist(newData);
+  };
+  
+  const deleteRetainer = (id: string) => {
+    const newData = { ...data, retainers: data.retainers.filter((r: any) => r.id !== id) };
+    persist(newData);
+  };
+  
   // Payment actions
   const addPayment = (payment: any) => {
     const newPayment = { ...payment, id: genId('pay') };
@@ -299,6 +321,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     addProject,
     updateProject,
     addInvoice,
+    addRetainer,
+    updateRetainer,
+    deleteRetainer,
     addPayment,
     addTask,
     updateTask,

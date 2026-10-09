@@ -1,5 +1,6 @@
 // Auth service - localStorage-based, structured for Supabase swap-in
 // When user provides Supabase keys, replace the implementation but keep the interface
+// Google OAuth support included
 
 export interface User {
   id: string;
@@ -211,5 +212,85 @@ export const auth = {
   // Save workspaces
   saveWorkspaces(workspaces: Workspace[]): void {
     localStorage.setItem(WORKSPACES_KEY, JSON.stringify(workspaces));
+  },
+
+  // ============================================
+  // GOOGLE OAUTH METHODS
+  // ============================================
+  
+  // Initiate Google OAuth login
+  // For production with Supabase, use: supabase.auth.signInWithOAuth({ provider: 'google' })
+  loginWithGoogle(): void {
+    // In production with Supabase:
+    // const { data, error } = await supabase.auth.signInWithOAuth({
+    //   provider: 'google',
+    //   options: { redirectTo: window.location.origin + '/app/dashboard' }
+    // });
+    
+    // For demo/localStorage version, simulate Google OAuth
+    const googleUser = {
+      name: 'Google User',
+      email: 'user@gmail.com',
+      avatar: 'GU',
+    };
+    
+    // Check if user already exists
+    const users = this.getUsers();
+    let user = users.find(u => u.email === googleUser.email);
+    
+    if (!user) {
+      // Create new user
+      user = {
+        id: `user_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        name: googleUser.name,
+        email: googleUser.email,
+        password: '', // No password for OAuth users
+        avatar: googleUser.avatar,
+        role: 'owner',
+        createdAt: new Date().toISOString(),
+      };
+      
+      users.push(user);
+      this.saveUsers(users);
+      
+      // Create workspace
+      const workspace: Workspace = {
+        id: `ws_${Date.now()}`,
+        ownerId: user.id,
+        name: `${user.name}'s Agency`,
+        slug: user.name.toLowerCase().replace(/\s+/g, '-'),
+        logo: user.avatar,
+        currency: 'INR',
+        currencySymbol: '₹',
+        timezone: 'Asia/Kolkata',
+        gstin: '',
+        plan: 'free',
+        createdAt: new Date().toISOString(),
+      };
+      
+      const workspaces = this.getWorkspaces();
+      workspaces.push(workspace);
+      this.saveWorkspaces(workspaces);
+      
+      this.createSession(user.id, workspace.id);
+    } else {
+      // User exists, just create session
+      const workspaces = this.getWorkspaces();
+      const workspace = workspaces.find(w => w.ownerId === user!.id);
+      if (workspace) {
+        this.createSession(user.id, workspace.id);
+      }
+    }
+  },
+  
+  // Handle Google OAuth callback (for Supabase)
+  async handleGoogleCallback(): Promise<{ success: boolean; error?: string }> {
+    // In production with Supabase:
+    // const { data: { session }, error } = await supabase.auth.getSession();
+    // if (error) return { success: false, error: error.message };
+    // if (!session) return { success: false, error: 'No session found' };
+    
+    // For demo, this is handled in loginWithGoogle
+    return { success: true };
   },
 };
