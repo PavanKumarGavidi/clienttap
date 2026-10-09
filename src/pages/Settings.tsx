@@ -67,8 +67,15 @@ export default function Settings() {
         avatar: avatarPreview || currentUser?.avatar
       });
       console.log('Profile saved successfully');
+      
+      // Update local state to reflect the changes
+      if (avatarPreview) {
+        setAvatarPreview(null); // Clear preview after save
+      }
+      
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
+      alert('Profile saved successfully!');
     } catch (error) {
       console.error('Error saving profile:', error);
       alert('Failed to save profile. Check console for details.');
@@ -91,6 +98,7 @@ export default function Settings() {
       console.log('Workspace saved successfully');
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
+      alert('Workspace saved successfully!');
     } catch (error) {
       console.error('Error saving workspace:', error);
       alert('Failed to save workspace. Check console for details.');

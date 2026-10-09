@@ -52,23 +52,30 @@ export default function Dashboard() {
         address: '',
         gstin: '',
         currency: 'INR',
-        currencySymbol: '₹',
+        currency_symbol: '₹',
         owner: 'u_001',
-        portalEnabled: false,
-        totalProjects: 0,
-        totalInvoiced: 0,
-        totalPaid: 0,
+        portal_enabled: false,
+        total_projects: 0,
+        total_invoiced: 0,
+        total_paid: 0,
         outstanding: 0,
         since: new Date().toISOString().split('T')[0],
       });
       console.log('Client added successfully');
-      await store.addNotification({ type: 'payment', title: 'New client added', message: `${newClientName} has been added`, time: 'Just now', read: false });
+      await store.addNotification({ 
+        type: 'payment', 
+        title: 'New client added', 
+        message: `${newClientName} has been added`, 
+        time: 'Just now', 
+        read: false 
+      });
       setNewClientName('');
       setNewClientEmail('');
       setShowAddClient(false);
+      alert('Client added successfully!');
     } catch (error) {
       console.error('Error adding client:', error);
-      alert('Failed to add client. Please try again.');
+      alert('Failed to add client. Check console for details.');
     }
   };
 
@@ -78,7 +85,7 @@ export default function Dashboard() {
       console.log('Scheduling meeting:', meetingTitle);
       await store.addMeeting({
         title: meetingTitle,
-        clientId: 'c1',
+        client_id: 'c1',
         date: meetingDate,
         time: meetingTime || '10:00',
         duration: 30,
@@ -87,14 +94,21 @@ export default function Dashboard() {
         notes: '',
       });
       console.log('Meeting scheduled successfully');
-      await store.addNotification({ type: 'meeting', title: 'Meeting scheduled', message: meetingTitle, time: 'Just now', read: false });
+      await store.addNotification({ 
+        type: 'meeting', 
+        title: 'Meeting scheduled', 
+        message: meetingTitle, 
+        time: 'Just now', 
+        read: false 
+      });
       setMeetingTitle('');
       setMeetingDate('');
       setMeetingTime('');
       setShowScheduleMeeting(false);
+      alert('Meeting scheduled successfully!');
     } catch (error) {
       console.error('Error scheduling meeting:', error);
-      alert('Failed to schedule meeting. Please try again.');
+      alert('Failed to schedule meeting. Check console for details.');
     }
   };
 

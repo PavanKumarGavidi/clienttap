@@ -1,5 +1,24 @@
 import { supabase } from './supabase';
 
+// Helper function to convert snake_case to camelCase
+function snakeToCamel(str: string): string {
+  return str.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+}
+
+// Helper function to convert object keys from snake_case to camelCase
+function convertKeysToCamel(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map(convertKeysToCamel);
+  } else if (obj !== null && typeof obj === 'object') {
+    return Object.keys(obj).reduce((acc, key) => {
+      const camelKey = snakeToCamel(key);
+      acc[camelKey] = convertKeysToCamel(obj[key]);
+      return acc;
+    }, {} as any);
+  }
+  return obj;
+}
+
 export interface WorkspaceData {
   leads: any[];
   clients: any[];
@@ -51,20 +70,21 @@ export const storage = {
         supabase.from('reviews').select('*').eq('workspace_id', workspaceId)
       ]);
 
+      // Convert snake_case to camelCase for all data
       return {
-        leads: leads || [],
-        clients: clients || [],
-        projects: projects || [],
-        invoices: invoices || [],
-        payments: payments || [],
-        tasks: tasks || [],
-        messages: messages || [],
-        meetings: meetings || [],
-        documents: documents || [],
-        notifications: notifications || [],
-        expenses: expenses || [],
-        retainers: retainers || [],
-        reviews: reviews || []
+        leads: convertKeysToCamel(leads || []),
+        clients: convertKeysToCamel(clients || []),
+        projects: convertKeysToCamel(projects || []),
+        invoices: convertKeysToCamel(invoices || []),
+        payments: convertKeysToCamel(payments || []),
+        tasks: convertKeysToCamel(tasks || []),
+        messages: convertKeysToCamel(messages || []),
+        meetings: convertKeysToCamel(meetings || []),
+        documents: convertKeysToCamel(documents || []),
+        notifications: convertKeysToCamel(notifications || []),
+        expenses: convertKeysToCamel(expenses || []),
+        retainers: convertKeysToCamel(retainers || []),
+        reviews: convertKeysToCamel(reviews || [])
       };
     } catch (error) {
       console.error('Error fetching workspace data:', error);

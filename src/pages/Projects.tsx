@@ -39,34 +39,51 @@ export default function Projects() {
   const totalReceived = store.projects.reduce((s: number, p: any) => s + p.received, 0);
   const totalPending = store.projects.reduce((s: number, p: any) => s + p.pending, 0);
 
-  const handleAddProject = () => {
+  const handleAddProject = async () => {
     if (!newProject.name || !newProject.deadline) return;
-    store.addProject({
-      ...newProject,
-      budget: Number(newProject.budget),
-    });
-    store.addNotification({
-      type: 'payment',
-      title: 'New project created',
-      message: newProject.name,
-      time: 'Just now',
-      read: false,
-    });
-    setNewProject({
-      name: '',
-      clientId: 'c1',
-      type: 'one-off',
-      budget: 0,
-      currency: 'INR',
-      startDate: new Date().toISOString().split('T')[0],
-      deadline: '',
-      status: 'ongoing',
-      progress: 0,
-      received: 0,
-      pending: 0,
-      team: ['u_001'],
-    });
-    setShowAddProject(false);
+    try {
+      console.log('Adding project:', newProject);
+      await store.addProject({
+        name: newProject.name,
+        client_id: newProject.clientId,
+        type: newProject.type,
+        budget: Number(newProject.budget),
+        currency: newProject.currency,
+        start_date: newProject.startDate,
+        deadline: newProject.deadline,
+        status: newProject.status,
+        progress: newProject.progress,
+        received: newProject.received,
+        pending: newProject.pending,
+      });
+      console.log('Project added successfully');
+      await store.addNotification({
+        type: 'payment',
+        title: 'New project created',
+        message: newProject.name,
+        time: 'Just now',
+        read: false,
+      });
+      setNewProject({
+        name: '',
+        clientId: 'c1',
+        type: 'one-off',
+        budget: 0,
+        currency: 'INR',
+        startDate: new Date().toISOString().split('T')[0],
+        deadline: '',
+        status: 'ongoing',
+        progress: 0,
+        received: 0,
+        pending: 0,
+        team: ['u_001'],
+      });
+      setShowAddProject(false);
+      alert('Project created successfully!');
+    } catch (error) {
+      console.error('Error adding project:', error);
+      alert('Failed to create project. Check console for details.');
+    }
   };
 
   const cardClass = `rounded-xl bg-white`;

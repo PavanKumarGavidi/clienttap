@@ -187,21 +187,33 @@ function TasksPage() {
   const [showAddTask, setShowAddTask] = useState(false);
   const [newTask, setNewTask] = useState({ title: '', assignee: 'u_001', dueDate: '', priority: 'medium' as 'high' | 'medium' | 'low', projectId: 'p1' });
 
-  const handleAddTask = () => {
+  const handleAddTask = async () => {
     if (!newTask.title.trim()) return;
-    store.addTask({
-      ...newTask,
-      status: 'todo',
-    });
-    store.addNotification({
-      type: 'payment',
-      title: 'New task created',
-      message: newTask.title,
-      time: 'Just now',
-      read: false,
-    });
-    setNewTask({ title: '', assignee: 'u_001', dueDate: '', priority: 'medium', projectId: 'p1' });
-    setShowAddTask(false);
+    try {
+      console.log('Adding task:', newTask);
+      await store.addTask({
+        title: newTask.title,
+        assignee: newTask.assignee,
+        due_date: newTask.dueDate,
+        priority: newTask.priority,
+        project_id: newTask.projectId,
+        status: 'todo',
+      });
+      console.log('Task added successfully');
+      await store.addNotification({
+        type: 'payment',
+        title: 'New task created',
+        message: newTask.title,
+        time: 'Just now',
+        read: false,
+      });
+      setNewTask({ title: '', assignee: 'u_001', dueDate: '', priority: 'medium', projectId: 'p1' });
+      setShowAddTask(false);
+      alert('Task created successfully!');
+    } catch (error) {
+      console.error('Error adding task:', error);
+      alert('Failed to create task. Check console for details.');
+    }
   };
 
   const getMember = (id: string) => teamMembers.find(m => m.id === id);

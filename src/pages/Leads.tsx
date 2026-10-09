@@ -101,23 +101,38 @@ export default function Leads() {
     }
   };
 
-  const handleAddLead = () => {
+  const handleAddLead = async () => {
     if (!newLead.name || !newLead.company) return;
-    store.addLead({
-      ...newLead,
-      stage: 's1',
-      createdAt: new Date().toISOString().split('T')[0],
-      followUp: false,
-    });
-    store.addNotification({
-      type: 'payment',
-      title: 'New lead added',
-      message: `${newLead.name} from ${newLead.company}`,
-      time: 'Just now',
-      read: false,
-    });
-    setNewLead({ name: '', company: '', email: '', phone: '', value: 0, currency: 'INR', source: 'Website', assignedTo: 'u_001' });
-    setShowAddLead(false);
+    try {
+      console.log('Adding lead:', newLead);
+      await store.addLead({
+        name: newLead.name,
+        company: newLead.company,
+        email: newLead.email,
+        phone: newLead.phone,
+        value: newLead.value,
+        currency: newLead.currency,
+        stage: 's1',
+        source: newLead.source,
+        assigned_to: newLead.assignedTo,
+        follow_up: false,
+        created_at: new Date().toISOString().split('T')[0],
+      });
+      console.log('Lead added successfully');
+      await store.addNotification({
+        type: 'payment',
+        title: 'New lead added',
+        message: `${newLead.name} from ${newLead.company}`,
+        time: 'Just now',
+        read: false,
+      });
+      setNewLead({ name: '', company: '', email: '', phone: '', value: 0, currency: 'INR', source: 'Website', assignedTo: 'u_001' });
+      setShowAddLead(false);
+      alert('Lead added successfully!');
+    } catch (error) {
+      console.error('Error adding lead:', error);
+      alert('Failed to add lead. Check console for details.');
+    }
   };
 
   const handleConvertToClient = (leadId: string) => {
