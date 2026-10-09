@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp } from '../App';
 import { useStore } from '../store/StoreContext';
 import { pipelineStages } from '../data/mockData';
@@ -8,9 +8,90 @@ export default function Settings() {
   const { darkMode } = useApp();
   const store = useStore();
   const [activeSection, setActiveSection] = useState('profile');
+  const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   
   const currentUser = store.currentUser;
   const currentWorkspace = store.currentWorkspace;
+  
+  // Profile state
+  const [profileName, setProfileName] = useState(currentUser?.name || '');
+  const [profileEmail, setProfileEmail] = useState(currentUser?.email || '');
+  const [profilePhone, setProfilePhone] = useState('');
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  
+  // Workspace state
+  const [workspaceName, setWorkspaceName] = useState(currentWorkspace?.name || '');
+  const [workspaceSlug, setWorkspaceSlug] = useState(currentWorkspace?.slug || '');
+  const [workspaceCurrency, setWorkspaceCurrency] = useState(currentWorkspace?.currency || 'INR');
+  const [workspaceTimezone, setTimezone] = useState(currentWorkspace?.timezone || 'Asia/Kolkata');
+  
+  // Update state when user/workspace changes
+  useEffect(() => {
+    if (currentUser) {
+      setProfileName(currentUser.name || '');
+      setProfileEmail(currentUser.email || '');
+    }
+    if (currentWorkspace) {
+      setWorkspaceName(currentWorkspace.name || '');
+      setWorkspaceSlug(currentWorkspace.slug || '');
+      setWorkspaceCurrency(currentWorkspace.currency || 'INR');
+      setTimezone(currentWorkspace.timezone || 'Asia/Kolkata');
+    }
+  }, [currentUser, currentWorkspace]);
+  
+  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert('File size must be less than 2MB');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+  const handleSaveProfile = async () => {
+    setSaving(true);
+    try {
+      await store.updateProfile({
+        name: profileName,
+        email: profileEmail,
+        avatar: avatarPreview || currentUser?.avatar
+      });
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      alert('Failed to save profile');
+    } finally {
+      setSaving(false);
+    }
+  };
+  
+  const handleSaveWorkspace = async () => {
+    setSaving(true);
+    try {
+      await store.updateWorkspace({
+        name: workspaceName,
+        slug: workspaceSlug,
+        currency: workspaceCurrency,
+        timezone: workspaceTimezone
+      });
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (error) {
+      console.error('Error saving workspace:', error);
+      alert('Failed to save workspace');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const cardClass = `rounded-xl bg-white`;
   const cardStyle = { border: '1px solid #E7E5E4' };
@@ -61,35 +142,74 @@ export default function Settings() {
           {activeSection === 'profile' && (
             <div className={`${cardClass} p-6 space-y-6`} style={cardStyle}>
               <h2 className="text-lg font-semibold">Profile Settings</h2>
+              
+              {saveSuccess && (
+                <div className="p-3 rounded-lg bg-green-50 border border-green-200 text-green-700 text-sm">
+                  ✓ Profile saved successfully!
+                </div>
+              )}
+              
               <div className="flex items-center gap-4">
-                <div className={`w-16 h-16 rounded-xl flex items-center justify-center text-3xl ${darkMode ? 'bg-white/10' : 'bg-gray-100'}`}>
-                  {currentUser?.avatar || '👤'}
+                <div className={`w-16 h-16 rounded-xl flex items-center justify-center text-3xl overflow-hidden ${darkMode ? 'bg-white/10' : 'bg-gray-100'}`}>
+                  {avatarPreview ? (
+                    <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    currentUser?.avatar || '👤'
+                  )}
                 </div>
                 <div>
-                  <button className="text-sm text-orange-600 font-medium">Change avatar</button>
+                  <label className="text-sm text-orange-600 font-medium cursor-pointer hover:text-orange-700">
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png"
+                      onChange={handleAvatarUpload}
+                      className="hidden"
+                    />
+                    Change avatar
+                  </label>
                   <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'} mt-1`}>JPG, PNG. Max 2MB.</p>
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Full Name</label>
-                  <input type="text" defaultValue={currentUser?.name || ''} className={inputClass} />
+                  <input 
+                    type="text" 
+                    value={profileName}
+                    onChange={(e) => setProfileName(e.target.value)}
+                    className={inputClass} 
+                  />
                 </div>
                 <div>
                   <label className={labelClass}>Email</label>
-                  <input type="email" defaultValue={currentUser?.email || ''} className={inputClass} />
+                  <input 
+                    type="email" 
+                    value={profileEmail}
+                    onChange={(e) => setProfileEmail(e.target.value)}
+                    className={inputClass} 
+                  />
                 </div>
                 <div>
                   <label className={labelClass}>Phone</label>
-                  <input type="tel" defaultValue="+91 98765 43210" className={inputClass} />
+                  <input 
+                    type="tel" 
+                    value={profilePhone}
+                    onChange={(e) => setProfilePhone(e.target.value)}
+                    placeholder="+91 98765 43210"
+                    className={inputClass} 
+                  />
                 </div>
                 <div>
                   <label className={labelClass}>Role</label>
-                  <input type="text" defaultValue="Owner" className={inputClass} disabled />
+                  <input type="text" value="Owner" className={inputClass} disabled />
                 </div>
               </div>
-              <button className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition">
-                <Save className="w-4 h-4" /> Save Changes
+              <button 
+                onClick={handleSaveProfile}
+                disabled={saving}
+                className="bg-orange-600 hover:bg-orange-700 disabled:bg-orange-400 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition"
+              >
+                <Save className="w-4 h-4" /> {saving ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
           )}
@@ -97,10 +217,22 @@ export default function Settings() {
           {activeSection === 'workspace' && (
             <div className={`${cardClass} p-6 space-y-6`} style={cardStyle}>
               <h2 className="text-lg font-semibold">Workspace Settings</h2>
+              
+              {saveSuccess && (
+                <div className="p-3 rounded-lg bg-green-50 border border-green-200 text-green-700 text-sm">
+                  ✓ Workspace saved successfully!
+                </div>
+              )}
+              
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Workspace Name</label>
-                  <input type="text" defaultValue={currentWorkspace?.name || ''} className={inputClass} />
+                  <input 
+                    type="text" 
+                    value={workspaceName}
+                    onChange={(e) => setWorkspaceName(e.target.value)}
+                    className={inputClass} 
+                  />
                 </div>
                 <div>
                   <label className={labelClass}>Agency Slug</label>
@@ -108,24 +240,37 @@ export default function Settings() {
                     <span className="px-3 py-2.5 rounded-l-lg text-sm bg-stone-50 border border-[#E7E5E4] text-gray-500">
                       portal.clienttap.io/
                     </span>
-                    <input type="text" defaultValue={currentWorkspace?.slug || ''} className={`${inputClass} rounded-l-none`} />
+                    <input 
+                      type="text" 
+                      value={workspaceSlug}
+                      onChange={(e) => setWorkspaceSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+                      className={`${inputClass} rounded-l-none`} 
+                    />
                   </div>
                 </div>
                 <div>
                   <label className={labelClass}>Base Currency</label>
-                  <select className={inputClass}>
-                    <option>INR (₹) - Indian Rupee</option>
-                    <option>USD ($) - US Dollar</option>
-                    <option>GBP (£) - British Pound</option>
-                    <option>EUR (€) - Euro</option>
+                  <select 
+                    value={workspaceCurrency}
+                    onChange={(e) => setWorkspaceCurrency(e.target.value)}
+                    className={inputClass}
+                  >
+                    <option value="INR">INR (₹) - Indian Rupee</option>
+                    <option value="USD">USD ($) - US Dollar</option>
+                    <option value="GBP">GBP (£) - British Pound</option>
+                    <option value="EUR">EUR (€) - Euro</option>
                   </select>
                 </div>
                 <div>
                   <label className={labelClass}>Timezone</label>
-                  <select className={inputClass}>
-                    <option>Asia/Kolkata (IST)</option>
-                    <option>America/New_York (EST)</option>
-                    <option>Europe/London (GMT)</option>
+                  <select 
+                    value={workspaceTimezone}
+                    onChange={(e) => setTimezone(e.target.value)}
+                    className={inputClass}
+                  >
+                    <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
+                    <option value="America/New_York">America/New_York (EST)</option>
+                    <option value="Europe/London">Europe/London (GMT)</option>
                   </select>
                 </div>
                 <div>
@@ -144,8 +289,12 @@ export default function Settings() {
                   </div>
                 </div>
               </div>
-              <button className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition">
-                <Save className="w-4 h-4" /> Save Changes
+              <button 
+                onClick={handleSaveWorkspace}
+                disabled={saving}
+                className="bg-orange-600 hover:bg-orange-700 disabled:bg-orange-400 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition"
+              >
+                <Save className="w-4 h-4" /> {saving ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
           )}
