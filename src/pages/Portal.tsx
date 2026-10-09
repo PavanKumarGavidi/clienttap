@@ -22,7 +22,8 @@ export default function Portal() {
   const totalOwed = clientInvoices.filter((i: any) => i.status !== 'paid').reduce((s: number, i: any) => s + i.amount, 0);
   const workspaceName = store.currentWorkspace?.name || 'Pixel & Code Studio';
 
-  const cardClass = `rounded-xl border bg-white`;
+  const cardClass = `rounded-xl bg-white`;
+  const cardStyle = { border: '1px solid #E7E5E4' };
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: FolderOpen },
@@ -82,7 +83,7 @@ export default function Portal() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Sidebar Nav */}
-          <nav className={`lg:w-56 shrink-0 ${cardClass} p-3 lg:p-4`}>
+          <nav className={`lg:w-56 shrink-0 ${cardClass} p-3 lg:p-4`} style={cardStyle}>
             <ul className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-x-visible">
               {navItems.map((item) => (
                 <li key={item.id}>
@@ -114,22 +115,22 @@ export default function Portal() {
 
                 {/* Quick Stats */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className={`${cardClass} p-5`}>
+                  <div className={`${cardClass} p-5`} style={cardStyle}>
                     <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Active Projects</p>
                     <p className="text-2xl font-bold mt-1">{clientProjects.filter(p => p.status === 'ongoing').length}</p>
                   </div>
-                  <div className={`${cardClass} p-5`}>
+                  <div className={`${cardClass} p-5`} style={cardStyle}>
                     <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Amount Owed</p>
                     <p className="text-2xl font-bold mt-1 text-amber-500">${totalOwed.toLocaleString()}</p>
                   </div>
-                  <div className={`${cardClass} p-5`}>
+                  <div className={`${cardClass} p-5`} style={cardStyle}>
                     <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Needs Attention</p>
                     <p className="text-2xl font-bold mt-1 text-orange-500">2</p>
                   </div>
                 </div>
 
                 {/* Active Projects */}
-                <div className={cardClass}>
+                <div className={cardClass} style={cardStyle}>
                   <h3 className="font-semibold p-5 pb-3">Running Projects</h3>
                   <div className="divide-y divide-gray-100 dark:divide-white/5">
                     {clientProjects.filter(p => p.status === 'ongoing').map((project) => (
@@ -151,7 +152,7 @@ export default function Portal() {
                 </div>
 
                 {/* Items Needing Attention */}
-                <div className={cardClass}>
+                <div className={cardClass} style={cardStyle}>
                   <h3 className="font-semibold p-5 pb-3 flex items-center gap-2">
                     <Bell className="w-4 h-4 text-orange-500" /> Needs Your Attention
                   </h3>
@@ -182,7 +183,7 @@ export default function Portal() {
               <div className="space-y-4 animate-fade-in">
                 <h2 className="text-xl font-bold">Your Projects</h2>
                 {clientProjects.map((project) => (
-                  <div key={project.id} className={`${cardClass} p-5`}>
+                  <div key={project.id} className={`${cardClass} p-5`} style={cardStyle}>
                     <div className="flex items-start justify-between mb-3">
                       <div>
                         <h3 className="font-semibold">{project.name}</h3>
@@ -212,7 +213,7 @@ export default function Portal() {
               <div className="space-y-4 animate-fade-in">
                 <h2 className="text-xl font-bold">Your Invoices</h2>
                 {clientInvoices.map((inv) => (
-                  <div key={inv.id} className={`${cardClass} p-5`}>
+                  <div key={inv.id} className={`${cardClass} p-5`} style={cardStyle}>
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="font-semibold">{inv.number}</h3>
@@ -244,7 +245,7 @@ export default function Portal() {
               <div className="space-y-4 animate-fade-in">
                 <h2 className="text-xl font-bold">Documents</h2>
                 {clientDocs.map((doc) => (
-                  <div key={doc.id} className={`${cardClass} p-5 flex items-center justify-between`}>
+                  <div key={doc.id} className={`${cardClass} p-5 flex items-center justify-between`} style={cardStyle}>
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${darkMode ? 'bg-orange-900/30' : 'bg-orange-100'}`}>
                         <FileText className="w-5 h-5 text-orange-600" />
@@ -272,7 +273,7 @@ export default function Portal() {
 
             {/* Messages */}
             {activeSection === 'messages' && (
-              <div className={`${cardClass} animate-fade-in`}>
+              <div className={`${cardClass} animate-fade-in`} style={cardStyle}>
                 <div className="p-4 border-b border-[#E7E5E4]">
                   <h2 className="font-semibold">Messages with {workspaceName}</h2>
                 </div>
@@ -317,7 +318,7 @@ export default function Portal() {
             {activeSection === 'reviews' && (
               <div className="space-y-6 animate-fade-in">
                 <h2 className="text-xl font-bold">Your Reviews</h2>
-                <div className={`${cardClass} p-6`}>
+                <div className={`${cardClass} p-6`} style={cardStyle}>
                   <div className="flex items-center gap-2 mb-4">
                     <Star className="w-5 h-5 text-orange-500 fill-orange-500" />
                     <span className="font-semibold">Leave a review for a completed project</span>

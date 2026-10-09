@@ -96,8 +96,8 @@ export default function Invoices() {
     return <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ backgroundColor: style.bg, color: style.text }}>{labels[status] || status}</span>;
   };
 
-  const cardClass = `rounded-xl border bg-white`;
-  const cardBorder = { borderColor: '#E7E5E4' };
+  const cardClass = `rounded-xl bg-white`;
+  const cardStyle = { border: '1px solid #E7E5E4' };
 
   return (
     <div className="p-4 lg:p-8 max-w-7xl mx-auto animate-fade-in" style={{ backgroundColor: '#FAFAF8' }}>
@@ -119,19 +119,19 @@ export default function Invoices() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className={`${cardClass} p-4 border-l-4 border-l-blue-500`}>
+        <div className={`${cardClass} p-4 border-l-4 border-l-blue-500`} style={cardStyle}>
           <p className="text-xs" style={{ color: '#78716C' }}>Total Invoiced</p>
           <p className="text-xl font-bold">₹{(totalInvoiced / 100000).toFixed(1)}L</p>
         </div>
-        <div className={`${cardClass} p-4 border-l-4 border-l-green-500`}>
+        <div className={`${cardClass} p-4 border-l-4 border-l-green-500`} style={cardStyle}>
           <p className="text-xs" style={{ color: '#78716C' }}>Collected</p>
           <p className="text-xl font-bold text-green-500">₹{(totalPaid / 100000).toFixed(1)}L</p>
         </div>
-        <div className={`${cardClass} p-4 border-l-4 border-l-red-500`}>
+        <div className={`${cardClass} p-4 border-l-4 border-l-red-500`} style={cardStyle}>
           <p className="text-xs" style={{ color: '#78716C' }}>Overdue</p>
           <p className="text-xl font-bold text-red-500">₹{(totalOverdue / 1000).toFixed(0)}K</p>
         </div>
-        <div className={`${cardClass} p-4 border-l-4 border-l-purple-500`}>
+        <div className={`${cardClass} p-4 border-l-4 border-l-purple-500`} style={cardStyle}>
           <p className="text-xs" style={{ color: '#78716C' }}>Expenses</p>
           <p className="text-xl font-bold">₹{(totalExpenses / 100000).toFixed(1)}L</p>
         </div>
@@ -173,7 +173,7 @@ export default function Invoices() {
             {filteredInvoices.map((inv) => {
               const client = getClient(inv.clientId);
               return (
-                <div key={inv.id} className={`${cardClass} p-5 hover:shadow-md transition`}>
+                <div key={inv.id} className={`${cardClass} p-5 hover:shadow-md transition`} style={cardStyle}>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#FFF8F2' }}>
@@ -224,7 +224,7 @@ export default function Invoices() {
           {store.payments.map((pay: any) => {
             const client = getClient(pay.clientId);
             return (
-              <div key={pay.id} className={`${cardClass} p-5`}>
+              <div key={pay.id} className={`${cardClass} p-5`} style={cardStyle}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#f0fdf4' }}>
@@ -250,7 +250,7 @@ export default function Invoices() {
       {activeTab === 'expenses' && (
         <div className="space-y-3">
           {store.expenses.map((exp: any) => (
-            <div key={exp.id} className={`${cardClass} p-5`}>
+            <div key={exp.id} className={`${cardClass} p-5`} style={cardStyle}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#fef2f2' }}>

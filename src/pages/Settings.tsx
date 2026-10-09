@@ -12,7 +12,8 @@ export default function Settings() {
   const currentUser = store.currentUser;
   const currentWorkspace = store.currentWorkspace;
 
-  const cardClass = `rounded-xl border bg-white`;
+  const cardClass = `rounded-xl bg-white`;
+  const cardStyle = { border: '1px solid #E7E5E4' };
   const inputClass = `w-full px-4 py-2.5 rounded-lg text-sm bg-white border focus:outline-none focus:ring-2 focus:ring-orange-500/30`;
   const labelClass = `block text-sm font-medium mb-1.5`;
 
@@ -35,7 +36,7 @@ export default function Settings() {
 
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Sidebar */}
-        <nav className={`lg:w-56 shrink-0 ${cardClass} p-3`}>
+        <nav className={`lg:w-56 shrink-0 ${cardClass} p-3`} style={cardStyle}>
           <ul className="flex lg:flex-col gap-1 overflow-x-auto">
             {sections.map((section) => (
               <li key={section.id}>
@@ -58,7 +59,7 @@ export default function Settings() {
         {/* Content */}
         <div className="flex-1 min-w-0">
           {activeSection === 'profile' && (
-            <div className={`${cardClass} p-6 space-y-6`}>
+            <div className={`${cardClass} p-6 space-y-6`} style={cardStyle}>
               <h2 className="text-lg font-semibold">Profile Settings</h2>
               <div className="flex items-center gap-4">
                 <div className={`w-16 h-16 rounded-xl flex items-center justify-center text-3xl ${darkMode ? 'bg-white/10' : 'bg-gray-100'}`}>
@@ -94,7 +95,7 @@ export default function Settings() {
           )}
 
           {activeSection === 'workspace' && (
-            <div className={`${cardClass} p-6 space-y-6`}>
+            <div className={`${cardClass} p-6 space-y-6`} style={cardStyle}>
               <h2 className="text-lg font-semibold">Workspace Settings</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -150,7 +151,7 @@ export default function Settings() {
           )}
 
           {activeSection === 'tax' && (
-            <div className={`${cardClass} p-6 space-y-6`}>
+            <div className={`${cardClass} p-6 space-y-6`} style={cardStyle}>
               <h2 className="text-lg font-semibold">Tax & GST Settings</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -187,7 +188,7 @@ export default function Settings() {
           )}
 
           {activeSection === 'invoices' && (
-            <div className={`${cardClass} p-6 space-y-6`}>
+            <div className={`${cardClass} p-6 space-y-6`} style={cardStyle}>
               <h2 className="text-lg font-semibold">Invoice Settings</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -219,7 +220,7 @@ export default function Settings() {
           )}
 
           {activeSection === 'pipeline' && (
-            <div className={`${cardClass} p-6 space-y-6`}>
+            <div className={`${cardClass} p-6 space-y-6`} style={cardStyle}>
               <h2 className="text-lg font-semibold">Pipeline Stages</h2>
               <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Customize your lead pipeline stages. Drag to reorder.</p>
               <div className="space-y-2">
@@ -236,7 +237,7 @@ export default function Settings() {
           )}
 
           {activeSection === 'integrations' && (
-            <div className={`${cardClass} p-6 space-y-6`}>
+            <div className={`${cardClass} p-6 space-y-6`} style={cardStyle}>
               <h2 className="text-lg font-semibold">Integrations</h2>
               <div className="space-y-3">
                 {[
@@ -267,7 +268,7 @@ export default function Settings() {
           )}
 
           {activeSection === 'notifications' && (
-            <div className={`${cardClass} p-6 space-y-6`}>
+            <div className={`${cardClass} p-6 space-y-6`} style={cardStyle}>
               <h2 className="text-lg font-semibold">Notification Preferences</h2>
               <div className="space-y-4">
                 {[
@@ -299,7 +300,7 @@ export default function Settings() {
           )}
 
           {activeSection === 'branding' && (
-            <div className={`${cardClass} p-6 space-y-6`}>
+            <div className={`${cardClass} p-6 space-y-6`} style={cardStyle}>
               <h2 className="text-lg font-semibold">Portal Branding</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -334,7 +335,7 @@ export default function Settings() {
           )}
 
           {activeSection === 'export' && (
-            <div className={`${cardClass} p-6 space-y-6`}>
+            <div className={`${cardClass} p-6 space-y-6`} style={cardStyle}>
               <h2 className="text-lg font-semibold">Data Export</h2>
               <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Export all your data anytime. No lock-in, ever.</p>
               <div className="space-y-3">
@@ -364,7 +365,7 @@ export default function Settings() {
           )}
 
           {activeSection === 'danger' && (
-            <div className={`${cardClass} p-6 space-y-6 border-red-500/30`}>
+            <div className={`${cardClass} p-6 space-y-6`} style={{ ...cardStyle, borderColor: 'rgba(239,68,68,0.3)' }}>
               <h2 className="text-lg font-semibold text-red-500">Danger Zone</h2>
               <div className="p-4 rounded-lg border border-red-100 bg-red-50">
                 <h4 className="font-medium text-sm text-red-600">Delete Account</h4>

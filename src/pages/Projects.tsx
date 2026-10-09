@@ -69,8 +69,8 @@ export default function Projects() {
     setShowAddProject(false);
   };
 
-  const cardClass = `rounded-xl border bg-white`;
-  const cardBorder = { borderColor: '#E7E5E4' };
+  const cardClass = `rounded-xl bg-white`;
+  const cardStyle = { border: '1px solid #E7E5E4' };
 
   return (
     <div className="p-4 lg:p-8 max-w-7xl mx-auto animate-fade-in" style={{ backgroundColor: '#FAFAF8' }}>
@@ -87,15 +87,15 @@ export default function Projects() {
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className={cardClass + ' p-4'}>
+        <div className={cardClass + ' p-4'} style={cardStyle}>
           <p className="text-xs" style={{ color: '#78716C' }}>Total Budget</p>
           <p className="text-xl font-bold">₹{(totalBudget / 100000).toFixed(1)}L</p>
         </div>
-        <div className={cardClass + ' p-4'}>
+        <div className={cardClass + ' p-4'} style={cardStyle}>
           <p className="text-xs" style={{ color: '#78716C' }}>Received</p>
           <p className="text-xl font-bold text-green-500">₹{(totalReceived / 100000).toFixed(1)}L</p>
         </div>
-        <div className={cardClass + ' p-4'}>
+        <div className={cardClass + ' p-4'} style={cardStyle}>
           <p className="text-xs" style={{ color: '#78716C' }}>Pending</p>
           <p className="text-xl font-bold text-amber-500">₹{(totalPending / 100000).toFixed(1)}L</p>
         </div>
@@ -138,7 +138,7 @@ export default function Projects() {
           {filteredProjects.map((project) => {
             const client = getClient(project.clientId);
             return (
-              <div key={project.id} className={`${cardClass} p-5 hover:shadow-md transition cursor-pointer`}>
+              <div key={project.id} className={`${cardClass} p-5 hover:shadow-md transition cursor-pointer`} style={cardStyle}>
                 <div className="flex items-start justify-between mb-3">
                   <div>
                     <h3 className="font-semibold" style={{ color: '#1C1917' }}>{project.name}</h3>
@@ -212,7 +212,7 @@ export default function Projects() {
 
       {/* List View */}
       {viewMode === 'list' && (
-        <div className={cardClass + ' overflow-hidden'}>
+        <div className={cardClass + ' overflow-hidden'} style={cardStyle}>
           <table className="w-full">
             <thead>
               <tr className="border-b border-[#E7E5E4]">
