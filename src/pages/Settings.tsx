@@ -25,6 +25,7 @@ export default function Settings() {
   const [workspaceSlug, setWorkspaceSlug] = useState(currentWorkspace?.slug || '');
   const [workspaceCurrency, setWorkspaceCurrency] = useState(currentWorkspace?.currency || 'INR');
   const [workspaceTimezone, setTimezone] = useState(currentWorkspace?.timezone || 'Asia/Kolkata');
+  const [workspaceLogo, setWorkspaceLogo] = useState<string | null>(null);
   
   // Sync when currentUser or currentWorkspace changes
   useEffect(() => {
@@ -40,6 +41,7 @@ export default function Settings() {
       setWorkspaceSlug(currentWorkspace.slug || '');
       setWorkspaceCurrency(currentWorkspace.currency || 'INR');
       setTimezone(currentWorkspace.timezone || 'Asia/Kolkata');
+      setWorkspaceLogo(currentWorkspace.logo || null);
     }
   }, [currentUser, currentWorkspace]);
   
@@ -91,12 +93,13 @@ export default function Settings() {
     setSaving(true);
     setSaveSuccess(false);
     try {
-      console.log('Saving workspace:', { workspaceName, workspaceSlug, workspaceCurrency, workspaceTimezone });
+      console.log('Saving workspace:', { workspaceName, workspaceSlug, workspaceCurrency, workspaceTimezone, workspaceLogo });
       await store.updateWorkspace({
         name: workspaceName,
         slug: workspaceSlug,
         currency: workspaceCurrency,
-        timezone: workspaceTimezone
+        timezone: workspaceTimezone,
+        logo: workspaceLogo || currentWorkspace?.logo
       });
       console.log('Workspace saved successfully');
       setSaveSuccess(true);
@@ -301,8 +304,29 @@ export default function Settings() {
                 <div>
                   <label className={labelClass}>Logo</label>
                   <div className="flex items-center gap-3 p-3 rounded-lg border border-[#E7E5E4]">
-                    <span className="text-2xl">{currentWorkspace?.logo || '🏢'}</span>
-                    <button className="text-sm text-orange-600 font-medium">Upload logo</button>
+                    {workspaceLogo ? (
+                      <img src={workspaceLogo} alt="Logo" className="w-10 h-10 object-contain rounded" />
+                    ) : (
+                      <span className="text-2xl">{currentWorkspace?.logo || '🏢'}</span>
+                    )}
+                    <label className="text-sm text-orange-600 font-medium cursor-pointer hover:text-orange-700">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              setWorkspaceLogo(reader.result as string);
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                        className="hidden"
+                      />
+                      Upload logo
+                    </label>
                   </div>
                 </div>
               </div>
@@ -472,8 +496,29 @@ export default function Settings() {
                 <div>
                   <label className={labelClass}>Portal Logo</label>
                   <div className="flex items-center gap-3 p-4 rounded-lg border border-[#E7E5E4]">
-                    <span className="text-3xl">{currentWorkspace?.logo || '🏢'}</span>
-                    <button className="text-sm text-orange-600 font-medium">Upload logo</button>
+                    {workspaceLogo ? (
+                      <img src={workspaceLogo} alt="Logo" className="w-12 h-12 object-contain rounded" />
+                    ) : (
+                      <span className="text-3xl">{currentWorkspace?.logo || '🏢'}</span>
+                    )}
+                    <label className="text-sm text-orange-600 font-medium cursor-pointer hover:text-orange-700">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              setWorkspaceLogo(reader.result as string);
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                        className="hidden"
+                      />
+                      Upload logo
+                    </label>
                   </div>
                 </div>
                 <div>
