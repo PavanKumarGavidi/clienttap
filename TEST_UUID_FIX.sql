@@ -73,7 +73,7 @@ BEGIN
   RAISE NOTICE '✅ Lead created successfully with UUID: %', test_lead_id;
   
   -- Verify the ID is a proper UUID
-  IF test_lead_id ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' THEN
+  IF test_lead_id::text ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' THEN
     RAISE NOTICE '✅ ID is a proper UUID format';
   ELSE
     RAISE EXCEPTION '❌ ID is NOT a proper UUID: %', test_lead_id;
