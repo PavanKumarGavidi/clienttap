@@ -210,21 +210,71 @@ export const auth = {
   async getCurrentUser(): Promise<User | null> {
     const { data: { user } } = await supabase.auth.getUser();
     
-    if (!user) return null;
+    if (!user) {
+      console.log('No user logged in');
+      return null;
+    }
+
+    console.log('Getting user:', user.id);
 
     // Fetch profile
-    const { data: profile } = await supabase
+    const { data: profile, error } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error fetching profile:', error);
+    }
+
+    // If no profile exists, create one automatically
+    if (!profile) {
+      console.log('No profile found, creating one...');
+      const userName = user.user_metadata?.name || user.email?.split('@')[0] || 'User';
+      
+      const { data: newProfile, error: createError } = await supabase
+        .from('profiles')
+        .insert({
+          id: user.id,
+          name: userName,
+          email: user.email,
+          avatar: getInitials(userName),
+          role: 'owner'
+        })
+        .select()
+        .single();
+
+      if (createError) {
+        console.error('Error creating profile:', createError);
+        // Return user data anyway with defaults
+        return {
+          id: user.id,
+          name: userName,
+          email: user.email || '',
+          avatar: getInitials(userName),
+          role: 'owner',
+          created_at: user.created_at || new Date().toISOString()
+        };
+      }
+
+      console.log('Profile created:', newProfile);
+      return {
+        id: user.id,
+        name: newProfile.name,
+        email: newProfile.email || user.email || '',
+        avatar: newProfile.avatar || getInitials(newProfile.name),
+        role: newProfile.role || 'owner',
+        created_at: user.created_at || new Date().toISOString()
+      };
+    }
 
     return {
       id: user.id,
-      name: profile?.name || user.email?.split('@')[0] || 'User',
-      email: user.email || '',
-      avatar: profile?.avatar || getInitials(profile?.name || 'User'),
-      role: profile?.role || 'owner',
+      name: profile.name,
+      email: profile.email || user.email || '',
+      avatar: profile.avatar || getInitials(profile.name),
+      role: profile.role || 'owner',
       created_at: user.created_at || new Date().toISOString()
     };
   },
@@ -233,16 +283,65 @@ export const auth = {
   async getCurrentWorkspace(): Promise<Workspace | null> {
     const { data: { user } } = await supabase.auth.getUser();
     
-    if (!user) return null;
+    if (!user) {
+      console.log('No user logged in');
+      return null;
+    }
+
+    console.log('Getting workspace for user:', user.id);
 
     // Fetch workspace
-    const { data: workspace } = await supabase
+    const { data: workspace, error } = await supabase
       .from('workspaces')
       .select('*')
       .eq('owner_id', user.id)
-      .single();
+      .maybeSingle();
 
-    if (!workspace) return null;
+    if (error) {
+      console.error('Error fetching workspace:', error);
+    }
+
+    // If no workspace exists, create one automatically
+    if (!workspace) {
+      console.log('No workspace found, creating one...');
+      const userName = user.user_metadata?.name || user.email?.split('@')[0] || 'User';
+      const slug = userName.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now();
+      
+      const { data: newWorkspace, error: createError } = await supabase
+        .from('workspaces')
+        .insert({
+          owner_id: user.id,
+          name: `${userName}'s Agency`,
+          slug: slug,
+          logo: getInitials(userName),
+          currency: 'INR',
+          currency_symbol: '₹',
+          timezone: 'Asia/Kolkata',
+          plan: 'free'
+        })
+        .select()
+        .single();
+
+      if (createError) {
+        console.error('Error creating workspace:', createError);
+        return null;
+      }
+
+      console.log('Workspace created:', newWorkspace);
+      return {
+        id: newWorkspace.id,
+        owner_id: newWorkspace.owner_id,
+        name: newWorkspace.name,
+        slug: newWorkspace.slug,
+        logo: newWorkspace.logo,
+        currency: newWorkspace.currency,
+        currency_symbol: newWorkspace.currency_symbol,
+        timezone: newWorkspace.timezone,
+        gstin: newWorkspace.gstin || '',
+        plan: newWorkspace.plan,
+        created_at: newWorkspace.created_at
+      };
+    }
 
     return {
       id: workspace.id,

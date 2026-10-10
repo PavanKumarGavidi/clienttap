@@ -110,14 +110,27 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const loadData = async () => {
       try {
+        console.log('🔄 Loading user and workspace...');
         const user = await auth.getCurrentUser();
+        console.log('✅ User loaded:', user);
+        
         const workspace = await auth.getCurrentWorkspace();
+        console.log('✅ Workspace loaded:', workspace);
         
         setCurrentUser(user);
         setCurrentWorkspace(workspace);
         
         if (workspace) {
+          console.log('📦 Loading data for workspace:', workspace.id);
           const data = await storage.getData(workspace.id);
+          console.log('✅ Data loaded:', {
+            leads: data.leads.length,
+            clients: data.clients.length,
+            projects: data.projects.length,
+            meetings: data.meetings.length,
+            tasks: data.tasks.length
+          });
+          
           setLeads(data.leads);
           setClients(data.clients);
           setProjects(data.projects);
@@ -131,9 +144,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           setExpenses(data.expenses);
           setRetainers(data.retainers);
           setReviews(data.reviews);
+        } else {
+          console.warn('⚠️ No workspace available - this should not happen after auto-creation');
         }
       } catch (error) {
-        console.error('Error loading data:', error);
+        console.error('❌ Error loading data:', error);
       } finally {
         setLoading(false);
       }
@@ -143,7 +158,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, []);
   
   const getWorkspaceId = useCallback(() => {
-    return currentWorkspace?.id || '';
+    const workspaceId = currentWorkspace?.id || '';
+    if (!workspaceId) {
+      console.error('❌ No workspace ID available. Current workspace:', currentWorkspace);
+    }
+    return workspaceId;
   }, [currentWorkspace]);
   
   // Refresh data from storage
