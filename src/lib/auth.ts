@@ -86,10 +86,16 @@ export const auth = {
 
       // Step 3: Create workspace
       console.log('🏢 Step 3: Creating workspace...');
-      const { data: workspace, error: workspaceError } = await supabase
+      console.log('📝 Workspace details:', { 
+        owner_id: authData.user.id, 
+        name: workspaceName, 
+        slug: slug 
+      });
+      
+      let { data: workspace, error: workspaceError } = await supabase
         .from('workspaces')
         .insert({
-          owner_id: authData.user.id,
+          owner_id: String(authData.user.id), // Convert UUID to string
           name: workspaceName || `${name}'s Agency`,
           slug: slug || name.toLowerCase().replace(/\s+/g, '-'),
           logo: getInitials(name),
@@ -103,10 +109,30 @@ export const auth = {
 
       if (workspaceError) {
         console.error('❌ Workspace creation failed:', workspaceError);
-        return { success: false, error: `Workspace error: ${workspaceError.message}` };
+        console.error('❌ Error details:', JSON.stringify(workspaceError, null, 2));
+        
+        // Try to create workspace with minimal fields as fallback
+        console.log('🔄 Attempting fallback workspace creation...');
+        const { data: fallbackWorkspace, error: fallbackError } = await supabase
+          .from('workspaces')
+          .insert({
+            owner_id: String(authData.user.id),
+            name: workspaceName || `${name}'s Agency`,
+            slug: (slug || name.toLowerCase().replace(/\s+/g, '-')) + '-' + Date.now()
+          })
+          .select()
+          .single();
+        
+        if (fallbackError) {
+          console.error('❌ Fallback workspace creation also failed:', fallbackError);
+          return { success: false, error: `Workspace error: ${workspaceError.message}` };
+        }
+        
+        console.log('✅ Fallback workspace created:', fallbackWorkspace?.id);
+        workspace = fallbackWorkspace;
+      } else {
+        console.log('✅ Workspace created:', workspace?.id);
       }
-
-      console.log('✅ Workspace created:', workspace?.id);
 
       // Step 4: Verify session
       console.log('🔑 Step 4: Verifying session...');
@@ -308,11 +334,14 @@ export const auth = {
       console.log('🏢 Getting workspace for user:', user.id);
 
       // Fetch workspace
+      console.log('🔍 Fetching workspace for owner_id:', user.id);
       const { data: workspace, error } = await supabase
         .from('workspaces')
         .select('*')
-        .eq('owner_id', user.id)
+        .eq('owner_id', String(user.id))
         .maybeSingle();
+      
+      console.log('📊 Workspace query result:', { workspace, error });
 
       if (error) {
         console.error('⚠️ Workspace fetch error:', error);
@@ -322,14 +351,17 @@ export const auth = {
       if (!workspace) {
         console.log('📝 No workspace found, creating one...');
         const userName = user.user_metadata?.name || user.email?.split('@')[0] || 'User';
-        const slug = userName.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now();
+        const workspaceName = user.user_metadata?.workspace_name || `${userName}'s Agency`;
+        const workspaceSlug = user.user_metadata?.slug || userName.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now();
         
-        const { data: newWorkspace, error: createError } = await supabase
+        console.log('🏢 Creating workspace with name:', workspaceName);
+        
+        let { data: newWorkspace, error: createError } = await supabase
           .from('workspaces')
           .insert({
-            owner_id: user.id,
-            name: `${userName}'s Agency`,
-            slug: slug,
+            owner_id: String(user.id),
+            name: workspaceName,
+            slug: workspaceSlug,
             logo: getInitials(userName),
             currency: 'INR',
             currency_symbol: '₹',
@@ -341,10 +373,30 @@ export const auth = {
 
         if (createError) {
           console.error('❌ Workspace creation error:', createError);
-          return null;
+          
+          // Try fallback with unique slug
+          console.log('🔄 Attempting fallback workspace creation...');
+          const fallbackSlug = workspaceSlug + '-' + Date.now();
+          const { data: fallbackWorkspace, error: fallbackError } = await supabase
+            .from('workspaces')
+            .insert({
+              owner_id: String(user.id),
+              name: workspaceName,
+              slug: fallbackSlug
+            })
+            .select()
+            .single();
+          
+          if (fallbackError) {
+            console.error('❌ Fallback workspace creation also failed:', fallbackError);
+            return null;
+          }
+          
+          newWorkspace = fallbackWorkspace;
         }
 
         console.log('✅ Workspace created:', newWorkspace?.id);
+        console.log('✅ Workspace name:', newWorkspace?.name);
         return {
           id: newWorkspace.id,
           owner_id: newWorkspace.owner_id,
