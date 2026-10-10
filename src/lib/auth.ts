@@ -23,12 +23,6 @@ export interface Workspace {
   created_at: string;
 }
 
-function getAvatarColor(name: string): string {
-  const colors = ['#ea580c', '#c2410c', '#9a3412', '#7c2d12', '#d97706', '#b45309'];
-  const index = name.charCodeAt(0) % colors.length;
-  return colors[index];
-}
-
 function getInitials(name: string): string {
   return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 }
@@ -44,7 +38,11 @@ export const auth = {
     country: string = 'IN'
   ): Promise<{ success: boolean; error?: string; user?: User }> {
     try {
-      // Create auth user
+      console.log('🔐 Starting signup process...');
+      console.log('📝 User details:', { name, email, workspaceName, slug, country });
+
+      // Step 1: Create auth user
+      console.log('👤 Step 1: Creating auth user...');
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
@@ -54,28 +52,40 @@ export const auth = {
       });
 
       if (authError) {
-        return { success: false, error: authError.message };
+        console.error('❌ Auth creation failed:', authError);
+        return { success: false, error: `Auth error: ${authError.message}` };
       }
 
       if (!authData.user) {
-        return { success: false, error: 'Failed to create user' };
+        console.error('❌ No user data returned');
+        return { success: false, error: 'Failed to create user - no user data returned' };
       }
 
-      // Create profile
-      const { error: profileError } = await supabase
+      console.log('✅ Auth user created:', authData.user.id);
+
+      // Step 2: Create profile
+      console.log('👤 Step 2: Creating profile...');
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .insert({
-          id: authData.user.id,
+          user_id: authData.user.id,
           name,
+          email,
           avatar: getInitials(name),
           role: 'owner'
-        });
+        })
+        .select()
+        .single();
 
       if (profileError) {
-        console.error('Profile creation error:', profileError);
+        console.error('⚠️ Profile creation error:', profileError);
+        // Continue anyway - we can create it later
+      } else {
+        console.log('✅ Profile created:', profileData?.id);
       }
 
-      // Create workspace
+      // Step 3: Create workspace
+      console.log('🏢 Step 3: Creating workspace...');
       const { data: workspace, error: workspaceError } = await supabase
         .from('workspaces')
         .insert({
@@ -92,39 +102,30 @@ export const auth = {
         .single();
 
       if (workspaceError) {
-        console.error('Workspace creation error:', workspaceError);
+        console.error('❌ Workspace creation failed:', workspaceError);
+        return { success: false, error: `Workspace error: ${workspaceError.message}` };
       }
 
-      // Create membership
-      if (workspace) {
-        await supabase.from('memberships').insert({
-          workspace_id: workspace.id,
-          user_id: authData.user.id,
-          role: 'owner'
+      console.log('✅ Workspace created:', workspace?.id);
+
+      // Step 4: Verify session
+      console.log('🔑 Step 4: Verifying session...');
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !sessionData.session) {
+        console.error('⚠️ Session verification failed, attempting auto sign-in...');
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password
         });
-
-        // Create default pipeline stages
-        const defaultStages = [
-          { name: 'New', color: '#3b82f6', order_index: 0 },
-          { name: 'Contacted', color: '#8b5cf6', order_index: 1 },
-          { name: 'Qualified', color: '#f59e0b', order_index: 2 },
-          { name: 'Won', color: '#22c55e', order_index: 3 },
-          { name: 'Lost', color: '#ef4444', order_index: 4 }
-        ];
-
-        await supabase.from('pipeline_stages').insert(
-          defaultStages.map(stage => ({
-            workspace_id: workspace.id,
-            ...stage
-          }))
-        );
-
-        // Create usage counter
-        await supabase.from('usage_counters').insert({
-          workspace_id: workspace.id,
-          ai_quotes_used: 0,
-          storage_used_bytes: 0
-        });
+        
+        if (signInError) {
+          console.error('❌ Auto sign-in failed:', signInError);
+          return { success: false, error: 'Signup succeeded but auto-login failed. Please log in manually.' };
+        }
+        console.log('✅ Auto sign-in successful');
+      } else {
+        console.log('✅ Session verified');
       }
 
       const user: User = {
@@ -136,34 +137,46 @@ export const auth = {
         created_at: new Date().toISOString()
       };
 
+      console.log('🎉 Signup completed successfully!');
       return { success: true, user };
     } catch (error: any) {
-      return { success: false, error: error.message };
+      console.error('❌ Signup exception:', error);
+      return { success: false, error: `Signup failed: ${error.message}` };
     }
   },
 
   // Login
   async login(email: string, password: string): Promise<{ success: boolean; error?: string; user?: User }> {
     try {
+      console.log('🔐 Starting login process...');
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       });
 
       if (error) {
+        console.error('❌ Login failed:', error);
         return { success: false, error: error.message };
       }
 
       if (!data.user) {
+        console.error('❌ No user data returned');
         return { success: false, error: 'Login failed' };
       }
 
+      console.log('✅ User authenticated:', data.user.id);
+
       // Fetch profile
-      const { data: profile } = await supabase
+      console.log('👤 Fetching profile...');
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', data.user.id)
-        .single();
+        .eq('user_id', data.user.id)
+        .maybeSingle();
+
+      if (profileError) {
+        console.error('⚠️ Profile fetch error:', profileError);
+      }
 
       const user: User = {
         id: data.user.id,
@@ -174,8 +187,10 @@ export const auth = {
         created_at: data.user.created_at || new Date().toISOString()
       };
 
+      console.log('✅ Login successful:', user.name);
       return { success: true, user };
     } catch (error: any) {
+      console.error('❌ Login exception:', error);
       return { success: false, error: error.message };
     }
   },
@@ -183,6 +198,7 @@ export const auth = {
   // Google OAuth login
   async loginWithGoogle(): Promise<{ success: boolean; error?: string }> {
     try {
+      console.log('🔐 Starting Google OAuth...');
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -191,11 +207,14 @@ export const auth = {
       });
 
       if (error) {
+        console.error('❌ Google OAuth failed:', error);
         return { success: false, error: error.message };
       }
 
+      console.log('✅ Google OAuth initiated');
       return { success: true };
     } catch (error: any) {
+      console.error('❌ Google OAuth exception:', error);
       return { success: false, error: error.message };
     }
   },
@@ -208,159 +227,163 @@ export const auth = {
 
   // Get current user
   async getCurrentUser(): Promise<User | null> {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      console.log('No user logged in');
-      return null;
-    }
-
-    console.log('Getting user:', user.id);
-
-    // Fetch profile
-    const { data: profile, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .maybeSingle();
-
-    if (error) {
-      console.error('Error fetching profile:', error);
-    }
-
-    // If no profile exists, create one automatically
-    if (!profile) {
-      console.log('No profile found, creating one...');
-      const userName = user.user_metadata?.name || user.email?.split('@')[0] || 'User';
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
       
-      const { data: newProfile, error: createError } = await supabase
-        .from('profiles')
-        .insert({
-          id: user.id,
-          name: userName,
-          email: user.email,
-          avatar: getInitials(userName),
-          role: 'owner'
-        })
-        .select()
-        .single();
+      if (!user) {
+        console.log('⚠️ No user logged in');
+        return null;
+      }
 
-      if (createError) {
-        console.error('Error creating profile:', createError);
-        // Return user data anyway with defaults
+      console.log('👤 Getting user:', user.id);
+
+      // Fetch profile
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error('⚠️ Profile fetch error:', error);
+      }
+
+      // If no profile exists, create one automatically
+      if (!profile) {
+        console.log('📝 No profile found, creating one...');
+        const userName = user.user_metadata?.name || user.email?.split('@')[0] || 'User';
+        
+        const { data: newProfile, error: createError } = await supabase
+          .from('profiles')
+          .insert({
+            user_id: user.id,
+            name: userName,
+            email: user.email,
+            avatar: getInitials(userName),
+            role: 'owner'
+          })
+          .select()
+          .single();
+
+        if (createError) {
+          console.error('⚠️ Profile creation error:', createError);
+        } else {
+          console.log('✅ Profile created:', newProfile?.id);
+        }
+
         return {
           id: user.id,
-          name: userName,
+          name: newProfile?.name || userName,
           email: user.email || '',
-          avatar: getInitials(userName),
-          role: 'owner',
+          avatar: newProfile?.avatar || getInitials(userName),
+          role: newProfile?.role || 'owner',
           created_at: user.created_at || new Date().toISOString()
         };
       }
 
-      console.log('Profile created:', newProfile);
       return {
         id: user.id,
-        name: newProfile.name,
-        email: newProfile.email || user.email || '',
-        avatar: newProfile.avatar || getInitials(newProfile.name),
-        role: newProfile.role || 'owner',
+        name: profile.name,
+        email: profile.email || user.email || '',
+        avatar: profile.avatar || getInitials(profile.name),
+        role: profile.role || 'owner',
         created_at: user.created_at || new Date().toISOString()
       };
+    } catch (error) {
+      console.error('❌ getCurrentUser error:', error);
+      return null;
     }
-
-    return {
-      id: user.id,
-      name: profile.name,
-      email: profile.email || user.email || '',
-      avatar: profile.avatar || getInitials(profile.name),
-      role: profile.role || 'owner',
-      created_at: user.created_at || new Date().toISOString()
-    };
   },
 
   // Get current workspace
   async getCurrentWorkspace(): Promise<Workspace | null> {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      console.log('No user logged in');
-      return null;
-    }
-
-    console.log('Getting workspace for user:', user.id);
-
-    // Fetch workspace
-    const { data: workspace, error } = await supabase
-      .from('workspaces')
-      .select('*')
-      .eq('owner_id', user.id)
-      .maybeSingle();
-
-    if (error) {
-      console.error('Error fetching workspace:', error);
-    }
-
-    // If no workspace exists, create one automatically
-    if (!workspace) {
-      console.log('No workspace found, creating one...');
-      const userName = user.user_metadata?.name || user.email?.split('@')[0] || 'User';
-      const slug = userName.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now();
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
       
-      const { data: newWorkspace, error: createError } = await supabase
-        .from('workspaces')
-        .insert({
-          owner_id: user.id,
-          name: `${userName}'s Agency`,
-          slug: slug,
-          logo: getInitials(userName),
-          currency: 'INR',
-          currency_symbol: '₹',
-          timezone: 'Asia/Kolkata',
-          plan: 'free'
-        })
-        .select()
-        .single();
-
-      if (createError) {
-        console.error('Error creating workspace:', createError);
+      if (!user) {
+        console.log('⚠️ No user logged in');
         return null;
       }
 
-      console.log('Workspace created:', newWorkspace);
-      return {
-        id: newWorkspace.id,
-        owner_id: newWorkspace.owner_id,
-        name: newWorkspace.name,
-        slug: newWorkspace.slug,
-        logo: newWorkspace.logo,
-        currency: newWorkspace.currency,
-        currency_symbol: newWorkspace.currency_symbol,
-        timezone: newWorkspace.timezone,
-        gstin: newWorkspace.gstin || '',
-        plan: newWorkspace.plan,
-        created_at: newWorkspace.created_at
-      };
-    }
+      console.log('🏢 Getting workspace for user:', user.id);
 
-    return {
-      id: workspace.id,
-      owner_id: workspace.owner_id,
-      name: workspace.name,
-      slug: workspace.slug,
-      logo: workspace.logo,
-      currency: workspace.currency,
-      currency_symbol: workspace.currency_symbol,
-      timezone: workspace.timezone,
-      gstin: workspace.gstin || '',
-      plan: workspace.plan,
-      created_at: workspace.created_at
-    };
+      // Fetch workspace
+      const { data: workspace, error } = await supabase
+        .from('workspaces')
+        .select('*')
+        .eq('owner_id', user.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error('⚠️ Workspace fetch error:', error);
+      }
+
+      // If no workspace exists, create one automatically
+      if (!workspace) {
+        console.log('📝 No workspace found, creating one...');
+        const userName = user.user_metadata?.name || user.email?.split('@')[0] || 'User';
+        const slug = userName.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now();
+        
+        const { data: newWorkspace, error: createError } = await supabase
+          .from('workspaces')
+          .insert({
+            owner_id: user.id,
+            name: `${userName}'s Agency`,
+            slug: slug,
+            logo: getInitials(userName),
+            currency: 'INR',
+            currency_symbol: '₹',
+            timezone: 'Asia/Kolkata',
+            plan: 'free'
+          })
+          .select()
+          .single();
+
+        if (createError) {
+          console.error('❌ Workspace creation error:', createError);
+          return null;
+        }
+
+        console.log('✅ Workspace created:', newWorkspace?.id);
+        return {
+          id: newWorkspace.id,
+          owner_id: newWorkspace.owner_id,
+          name: newWorkspace.name,
+          slug: newWorkspace.slug,
+          logo: newWorkspace.logo,
+          currency: newWorkspace.currency,
+          currency_symbol: newWorkspace.currency_symbol,
+          timezone: newWorkspace.timezone,
+          gstin: newWorkspace.gstin || '',
+          plan: newWorkspace.plan,
+          created_at: newWorkspace.created_at
+        };
+      }
+
+      return {
+        id: workspace.id,
+        owner_id: workspace.owner_id,
+        name: workspace.name,
+        slug: workspace.slug,
+        logo: workspace.logo,
+        currency: workspace.currency,
+        currency_symbol: workspace.currency_symbol,
+        timezone: workspace.timezone,
+        gstin: workspace.gstin || '',
+        plan: workspace.plan,
+        created_at: workspace.created_at
+      };
+    } catch (error) {
+      console.error('❌ getCurrentWorkspace error:', error);
+      return null;
+    }
   },
 
   // Logout
   async logout(): Promise<void> {
+    console.log('🚪 Logging out...');
     await supabase.auth.signOut();
+    console.log('✅ Logged out successfully');
   },
 
   // Check if authenticated
@@ -371,23 +394,23 @@ export const auth = {
 
   // Update user profile
   async updateProfile(userId: string, updates: Partial<User>): Promise<void> {
-    console.log('Updating profile:', userId, updates);
+    console.log('📝 Updating profile:', userId, updates);
     const { data, error } = await supabase
       .from('profiles')
       .update(updates)
-      .eq('id', userId)
+      .eq('user_id', userId)
       .select();
     
     if (error) {
-      console.error('Error updating profile:', error);
+      console.error('❌ Profile update error:', error);
       throw error;
     }
-    console.log('Profile updated successfully:', data);
+    console.log('✅ Profile updated successfully:', data);
   },
 
   // Update workspace
   async updateWorkspace(workspaceId: string, updates: Partial<Workspace>): Promise<void> {
-    console.log('Updating workspace:', workspaceId, updates);
+    console.log('🏢 Updating workspace:', workspaceId, updates);
     const { data, error } = await supabase
       .from('workspaces')
       .update(updates)
@@ -395,25 +418,29 @@ export const auth = {
       .select();
     
     if (error) {
-      console.error('Error updating workspace:', error);
+      console.error('❌ Workspace update error:', error);
       throw error;
     }
-    console.log('Workspace updated successfully:', data);
+    console.log('✅ Workspace updated successfully:', data);
   },
 
   // Forgot password
   async resetPassword(email: string): Promise<{ success: boolean; error?: string }> {
     try {
+      console.log('🔑 Requesting password reset for:', email);
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: window.location.origin + '/#/reset-password'
       });
 
       if (error) {
+        console.error('❌ Password reset request failed:', error);
         return { success: false, error: error.message };
       }
 
+      console.log('✅ Password reset email sent');
       return { success: true };
     } catch (error: any) {
+      console.error('❌ Password reset exception:', error);
       return { success: false, error: error.message };
     }
   },
@@ -421,16 +448,20 @@ export const auth = {
   // Update password
   async updatePassword(newPassword: string): Promise<{ success: boolean; error?: string }> {
     try {
+      console.log('🔑 Updating password...');
       const { error } = await supabase.auth.updateUser({
         password: newPassword
       });
 
       if (error) {
+        console.error('❌ Password update failed:', error);
         return { success: false, error: error.message };
       }
 
+      console.log('✅ Password updated successfully');
       return { success: true };
     } catch (error: any) {
+      console.error('❌ Password update exception:', error);
       return { success: false, error: error.message };
     }
   }
