@@ -73,8 +73,12 @@ export default function AppLayout() {
         {/* Workspace info */}
         <div className="px-4 py-3 border-b" style={{ borderColor: '#E7E5E4' }}>
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-lg flex items-center justify-center text-lg" style={{ backgroundColor: '#FFF8F2' }}>
-              {currentWorkspace?.logo || '🏢'}
+            <div className="w-9 h-9 rounded-lg flex items-center justify-center text-lg overflow-hidden" style={{ backgroundColor: '#FFF8F2' }}>
+              {currentWorkspace?.logo && currentWorkspace.logo.startsWith('data:image') ? (
+                <img src={currentWorkspace.logo} alt="Workspace Logo" className="w-full h-full object-cover" />
+              ) : (
+                <span>{currentWorkspace?.logo || '🏢'}</span>
+              )}
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold truncate" style={{ color: '#1C1917' }}>{currentWorkspace?.name || 'My Workspace'}</p>

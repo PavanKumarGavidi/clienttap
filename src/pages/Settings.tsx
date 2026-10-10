@@ -178,13 +178,15 @@ export default function Settings() {
                   )}
                 </div>
                 <div>
-                  <label className="text-sm text-orange-600 font-medium cursor-pointer hover:text-orange-700">
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/png"
-                      onChange={handleAvatarUpload}
-                      className="hidden"
-                    />
+                  <input
+                    type="file"
+                    id="avatar-upload"
+                    name="avatar"
+                    accept="image/jpeg,image/png"
+                    onChange={handleAvatarUpload}
+                    className="hidden"
+                  />
+                  <label htmlFor="avatar-upload" className="text-sm text-orange-600 font-medium cursor-pointer hover:text-orange-700">
                     Change avatar
                   </label>
                   <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'} mt-1`}>JPG, PNG. Max 2MB.</p>
@@ -192,8 +194,10 @@ export default function Settings() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className={labelClass}>Full Name</label>
+                  <label htmlFor="profile-name" className={labelClass}>Full Name</label>
                   <input 
+                    id="profile-name"
+                    name="profileName"
                     type="text" 
                     value={profileName}
                     onChange={(e) => setProfileName(e.target.value)}
@@ -201,8 +205,10 @@ export default function Settings() {
                   />
                 </div>
                 <div>
-                  <label className={labelClass}>Email</label>
+                  <label htmlFor="profile-email" className={labelClass}>Email</label>
                   <input 
+                    id="profile-email"
+                    name="profileEmail"
                     type="email" 
                     value={profileEmail}
                     onChange={(e) => setProfileEmail(e.target.value)}
@@ -210,8 +216,10 @@ export default function Settings() {
                   />
                 </div>
                 <div>
-                  <label className={labelClass}>Phone</label>
+                  <label htmlFor="profile-phone" className={labelClass}>Phone</label>
                   <input 
+                    id="profile-phone"
+                    name="profilePhone"
                     type="tel" 
                     value={profilePhone}
                     onChange={(e) => setProfilePhone(e.target.value)}
@@ -220,8 +228,8 @@ export default function Settings() {
                   />
                 </div>
                 <div>
-                  <label className={labelClass}>Role</label>
-                  <input type="text" value="Owner" className={inputClass} disabled />
+                  <label htmlFor="profile-role" className={labelClass}>Role</label>
+                  <input id="profile-role" name="profileRole" type="text" value="Owner" className={inputClass} disabled />
                 </div>
               </div>
               <button 
@@ -246,8 +254,10 @@ export default function Settings() {
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className={labelClass}>Workspace Name</label>
+                  <label htmlFor="workspace-name" className={labelClass}>Workspace Name</label>
                   <input 
+                    id="workspace-name"
+                    name="workspaceName"
                     type="text" 
                     value={workspaceName}
                     onChange={(e) => setWorkspaceName(e.target.value)}
@@ -255,12 +265,14 @@ export default function Settings() {
                   />
                 </div>
                 <div>
-                  <label className={labelClass}>Agency Slug</label>
+                  <label htmlFor="workspace-slug" className={labelClass}>Agency Slug</label>
                   <div className="flex">
                     <span className="px-3 py-2.5 rounded-l-lg text-sm bg-stone-50 border border-[#E7E5E4] text-gray-500">
                       portal.clienttap.io/
                     </span>
                     <input 
+                      id="workspace-slug"
+                      name="workspaceSlug"
                       type="text" 
                       value={workspaceSlug}
                       onChange={(e) => setWorkspaceSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
@@ -269,8 +281,10 @@ export default function Settings() {
                   </div>
                 </div>
                 <div>
-                  <label className={labelClass}>Base Currency</label>
+                  <label htmlFor="workspace-currency" className={labelClass}>Base Currency</label>
                   <select 
+                    id="workspace-currency"
+                    name="workspaceCurrency"
                     value={workspaceCurrency}
                     onChange={(e) => setWorkspaceCurrency(e.target.value)}
                     className={inputClass}
@@ -282,8 +296,10 @@ export default function Settings() {
                   </select>
                 </div>
                 <div>
-                  <label className={labelClass}>Timezone</label>
+                  <label htmlFor="workspace-timezone" className={labelClass}>Timezone</label>
                   <select 
+                    id="workspace-timezone"
+                    name="workspaceTimezone"
                     value={workspaceTimezone}
                     onChange={(e) => setTimezone(e.target.value)}
                     className={inputClass}
@@ -294,37 +310,43 @@ export default function Settings() {
                   </select>
                 </div>
                 <div>
-                  <label className={labelClass}>Financial Year Start</label>
-                  <select className={inputClass}>
+                  <label htmlFor="workspace-financial-year" className={labelClass}>Financial Year Start</label>
+                  <select id="workspace-financial-year" name="financialYear" className={inputClass}>
                     <option>April (India)</option>
                     <option>January</option>
                     <option>July</option>
                   </select>
                 </div>
                 <div>
-                  <label className={labelClass}>Logo</label>
+                  <label htmlFor="workspace-logo-upload" className={labelClass}>Logo</label>
                   <div className="flex items-center gap-3 p-3 rounded-lg border border-[#E7E5E4]">
                     {workspaceLogo ? (
-                      <img src={workspaceLogo} alt="Logo" className="w-10 h-10 object-contain rounded" />
+                      <img src={workspaceLogo} alt="Workspace Logo" className="w-10 h-10 object-contain rounded" />
                     ) : (
                       <span className="text-2xl">{currentWorkspace?.logo || '🏢'}</span>
                     )}
-                    <label className="text-sm text-orange-600 font-medium cursor-pointer hover:text-orange-700">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            const reader = new FileReader();
-                            reader.onloadend = () => {
-                              setWorkspaceLogo(reader.result as string);
-                            };
-                            reader.readAsDataURL(file);
+                    <input
+                      id="workspace-logo-upload"
+                      name="workspaceLogo"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          if (file.size > 2 * 1024 * 1024) {
+                            alert('File size must be less than 2MB');
+                            return;
                           }
-                        }}
-                        className="hidden"
-                      />
+                          const reader = new FileReader();
+                          reader.onloadend = () => {
+                            setWorkspaceLogo(reader.result as string);
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      className="hidden"
+                    />
+                    <label htmlFor="workspace-logo-upload" className="text-sm text-orange-600 font-medium cursor-pointer hover:text-orange-700">
                       Upload logo
                     </label>
                   </div>
@@ -345,12 +367,12 @@ export default function Settings() {
               <h2 className="text-lg font-semibold">Tax & GST Settings</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className={labelClass}>GSTIN</label>
-                  <input type="text" defaultValue={currentWorkspace?.gstin || ''} className={inputClass} />
+                  <label htmlFor="tax-gstin" className={labelClass}>GSTIN</label>
+                  <input id="tax-gstin" name="gstin" type="text" defaultValue={currentWorkspace?.gstin || ''} className={inputClass} />
                 </div>
                 <div>
-                  <label className={labelClass}>Business State</label>
-                  <select className={inputClass}>
+                  <label htmlFor="tax-state" className={labelClass}>Business State</label>
+                  <select id="tax-state" name="businessState" className={inputClass}>
                     <option>Karnataka (29)</option>
                     <option>Maharashtra (27)</option>
                     <option>Delhi (07)</option>
@@ -358,12 +380,12 @@ export default function Settings() {
                   </select>
                 </div>
                 <div>
-                  <label className={labelClass}>Default Tax Rate (%)</label>
-                  <input type="number" defaultValue={18} className={inputClass} />
+                  <label htmlFor="tax-rate" className={labelClass}>Default Tax Rate (%)</label>
+                  <input id="tax-rate" name="taxRate" type="number" defaultValue={18} className={inputClass} />
                 </div>
                 <div>
-                  <label className={labelClass}>Default SAC/HSN Code</label>
-                  <input type="text" defaultValue="998314" className={inputClass} />
+                  <label htmlFor="tax-sac" className={labelClass}>Default SAC/HSN Code</label>
+                  <input id="tax-sac" name="sacCode" type="text" defaultValue="998314" className={inputClass} />
                 </div>
               </div>
               <div className={`p-4 rounded-lg ${darkMode ? 'bg-white/5' : 'bg-blue-50'}`}>
@@ -382,16 +404,16 @@ export default function Settings() {
               <h2 className="text-lg font-semibold">Invoice Settings</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className={labelClass}>Invoice Prefix</label>
-                  <input type="text" defaultValue="PC" className={inputClass} />
+                  <label htmlFor="invoice-prefix" className={labelClass}>Invoice Prefix</label>
+                  <input id="invoice-prefix" name="invoicePrefix" type="text" defaultValue="PC" className={inputClass} />
                 </div>
                 <div>
-                  <label className={labelClass}>Next Number</label>
-                  <input type="number" defaultValue={8} className={inputClass} />
+                  <label htmlFor="invoice-next-number" className={labelClass}>Next Number</label>
+                  <input id="invoice-next-number" name="nextNumber" type="number" defaultValue={8} className={inputClass} />
                 </div>
                 <div>
-                  <label className={labelClass}>Default Payment Terms</label>
-                  <select className={inputClass}>
+                  <label htmlFor="invoice-payment-terms" className={labelClass}>Default Payment Terms</label>
+                  <select id="invoice-payment-terms" name="paymentTerms" className={inputClass}>
                     <option>Due on receipt</option>
                     <option>Net 15</option>
                     <option>Net 30</option>
@@ -399,8 +421,8 @@ export default function Settings() {
                   </select>
                 </div>
                 <div>
-                  <label className={labelClass}>Bank / UPI Details</label>
-                  <textarea defaultValue="HDFC Bank\nA/C: 1234567890\nIFSC: HDFC0001234\nUPI: pixelcode@hdfc" className={`${inputClass} h-24 resize-none`} />
+                  <label htmlFor="invoice-bank-details" className={labelClass}>Bank / UPI Details</label>
+                  <textarea id="invoice-bank-details" name="bankDetails" defaultValue="HDFC Bank\nA/C: 1234567890\nIFSC: HDFC0001234\nUPI: pixelcode@hdfc" className={`${inputClass} h-24 resize-none`} />
                 </div>
               </div>
               <button className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition">
@@ -417,7 +439,13 @@ export default function Settings() {
                 {pipelineStages.map((stage) => (
                   <div key={stage.id} className={`flex items-center gap-3 p-3 rounded-lg ${darkMode ? 'bg-white/5' : 'bg-gray-50'}`}>
                     <div className="w-4 h-4 rounded-full" style={{ backgroundColor: stage.color }} />
-                    <input type="text" defaultValue={stage.name} className={`flex-1 bg-transparent text-sm font-medium ${darkMode ? 'text-white' : 'text-gray-900'} focus:outline-none`} />
+                    <input 
+                      id={`pipeline-stage-${stage.id}`}
+                      name={`stage-${stage.id}`}
+                      type="text" 
+                      defaultValue={stage.name} 
+                      className={`flex-1 bg-transparent text-sm font-medium ${darkMode ? 'text-white' : 'text-gray-900'} focus:outline-none`} 
+                    />
                     <span className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>Order: {stage.order + 1}</span>
                   </div>
                 ))}
@@ -470,16 +498,28 @@ export default function Settings() {
                   { label: 'Document signed', inApp: true, email: true },
                   { label: 'Review received', inApp: true, email: false },
                   { label: 'Subscription & billing', inApp: true, email: true },
-                ].map((pref) => (
+                ].map((pref, index) => (
                   <div key={pref.label} className="flex items-center justify-between">
                     <span className="text-sm">{pref.label}</span>
                     <div className="flex items-center gap-4">
                       <label className="flex items-center gap-2">
-                        <input type="checkbox" defaultChecked={pref.inApp} className="rounded text-orange-600" />
+                        <input 
+                          id={`notification-${index}-inapp`}
+                          name={`notification-${index}-inapp`}
+                          type="checkbox" 
+                          defaultChecked={pref.inApp} 
+                          className="rounded text-orange-600" 
+                        />
                         <span className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>In-app</span>
                       </label>
                       <label className="flex items-center gap-2">
-                        <input type="checkbox" defaultChecked={pref.email} className="rounded text-orange-600" />
+                        <input 
+                          id={`notification-${index}-email`}
+                          name={`notification-${index}-email`}
+                          type="checkbox" 
+                          defaultChecked={pref.email} 
+                          className="rounded text-orange-600" 
+                        />
                         <span className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>Email</span>
                       </label>
                     </div>
@@ -494,50 +534,56 @@ export default function Settings() {
               <h2 className="text-lg font-semibold">Portal Branding</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className={labelClass}>Portal Logo</label>
+                  <label htmlFor="portal-logo-upload" className={labelClass}>Portal Logo</label>
                   <div className="flex items-center gap-3 p-4 rounded-lg border border-[#E7E5E4]">
                     {workspaceLogo ? (
-                      <img src={workspaceLogo} alt="Logo" className="w-12 h-12 object-contain rounded" />
+                      <img src={workspaceLogo} alt="Portal Logo" className="w-12 h-12 object-contain rounded" />
                     ) : (
                       <span className="text-3xl">{currentWorkspace?.logo || '🏢'}</span>
                     )}
-                    <label className="text-sm text-orange-600 font-medium cursor-pointer hover:text-orange-700">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            const reader = new FileReader();
-                            reader.onloadend = () => {
-                              setWorkspaceLogo(reader.result as string);
-                            };
-                            reader.readAsDataURL(file);
+                    <input
+                      id="portal-logo-upload"
+                      name="portalLogo"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          if (file.size > 2 * 1024 * 1024) {
+                            alert('File size must be less than 2MB');
+                            return;
                           }
-                        }}
-                        className="hidden"
-                      />
+                          const reader = new FileReader();
+                          reader.onloadend = () => {
+                            setWorkspaceLogo(reader.result as string);
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      className="hidden"
+                    />
+                    <label htmlFor="portal-logo-upload" className="text-sm text-orange-600 font-medium cursor-pointer hover:text-orange-700">
                       Upload logo
                     </label>
                   </div>
                 </div>
                 <div>
-                  <label className={labelClass}>Brand Color</label>
+                  <label htmlFor="brand-color" className={labelClass}>Brand Color</label>
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-orange-600" />
-                    <input type="text" defaultValue="#ea580c" className={inputClass} />
+                    <input id="brand-color" name="brandColor" type="text" defaultValue="#ea580c" className={inputClass} />
                   </div>
                 </div>
                 <div>
-                  <label className={labelClass}>Custom Domain</label>
-                  <input type="text" placeholder="clients.youragency.com" className={inputClass} />
+                  <label htmlFor="custom-domain" className={labelClass}>Custom Domain</label>
+                  <input id="custom-domain" name="customDomain" type="text" placeholder="clients.youragency.com" className={inputClass} />
                   <p className={`text-xs mt-1 ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>Ultra plan required</p>
                 </div>
                 <div>
-                  <label className={labelClass}>White-Label</label>
+                  <label htmlFor="white-label" className={labelClass}>White-Label</label>
                   <div className="flex items-center gap-3 p-3 rounded-lg border border-[#E7E5E4]">
-                    <input type="checkbox" className="rounded text-orange-600" />
-                    <span className="text-sm">Hide "Powered by Clienttap"</span>
+                    <input id="white-label" name="whiteLabel" type="checkbox" className="rounded text-orange-600" />
+                    <label htmlFor="white-label" className="text-sm cursor-pointer">Hide "Powered by Clienttap"</label>
                   </div>
                   <p className={`text-xs mt-1 ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>Ultra plan required</p>
                 </div>
