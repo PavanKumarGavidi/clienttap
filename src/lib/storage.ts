@@ -115,11 +115,16 @@ export const storage = {
     console.log(`[Storage] Adding ${collection} to workspace ${workspaceId}`);
     console.log('[Storage] Item data:', item);
     
+    // Remove id field - let database generate UUID
+    const { id, ...itemWithoutId } = item;
+    
     // Ensure all required fields are present
     const dataToInsert = {
-      ...item,
+      ...itemWithoutId,
       workspace_id: workspaceId,
     };
+    
+    console.log('[Storage] Inserting data (without id):', dataToInsert);
     
     const { data, error } = await supabase
       .from(collection)

@@ -14,6 +14,13 @@ import Retainers from './pages/Retainers';
 import Portal from './pages/Portal';
 import Settings from './pages/Settings';
 import OtherPages from './pages/OtherPages';
+import { useStore } from './store/StoreContext';
+
+// Wrapper component that forces Settings to remount when user changes
+function SettingsWrapper() {
+  const { currentUser } = useStore();
+  return <Settings key={currentUser?.id || 'no-user'} />;
+}
 
 interface AppContextType {
   darkMode: boolean;
@@ -101,7 +108,7 @@ function AppContent() {
             <Route path="team" element={<OtherPages page="team" />} />
             <Route path="billing" element={<OtherPages page="billing" />} />
             <Route path="activity" element={<OtherPages page="activity" />} />
-            <Route path="settings" element={<Settings />} />
+            <Route path="settings" element={<SettingsWrapper />} />
           </Route>
 
           {/* Client Portal - Public */}

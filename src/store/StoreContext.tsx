@@ -204,11 +204,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     
     console.log('[Store] Adding lead with workspace ID:', workspaceId);
     
-    // Generate ID if not provided
-    const leadId = lead.id || genId('l');
-    
+    // Don't generate ID - let database create UUID
     const newLead = {
-      id: leadId,
       workspace_id: workspaceId,
       name: lead.name || '',
       company: lead.company || '',
@@ -229,7 +226,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       const result = await storage.addItem(workspaceId, 'leads', newLead);
       console.log('[Store] Lead added to Supabase successfully:', result);
       
-      // Refresh data from Supabase
+      // Refresh data from Supabase to get the database-generated UUID
       const data = await storage.getData(workspaceId);
       setLeads(data.leads);
       console.log('[Store] Leads refreshed from Supabase:', data.leads.length, 'leads');
@@ -270,7 +267,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     if (!workspaceId) return;
     
     const newClient = {
-      id: genId('c'),
       workspace_id: workspaceId,
       name: lead.name,
       company: lead.company,
@@ -289,8 +285,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       since: new Date().toISOString().split('T')[0]
     };
     
-    await storage.addItem(workspaceId, 'clients', newClient);
-    setClients(prev => [...prev, newClient]);
+    const result = await storage.addItem(workspaceId, 'clients', newClient);
+    // Refresh to get database-generated UUID
+    const data = await storage.getData(workspaceId);
+    setClients(data.clients);
     await updateLead(id, { stage: 's5', won_date: new Date().toISOString().split('T')[0] });
   };
   
@@ -304,11 +302,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     
     console.log('[Store] Adding client with workspace ID:', workspaceId);
     
-    // Generate ID if not provided
-    const clientId = client.id || genId('c');
-    
+    // Don't generate ID - let database create UUID
     const newClient = {
-      id: clientId,
       workspace_id: workspaceId,
       name: client.name || '',
       company: client.company || client.name || '',
@@ -365,11 +360,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     
     console.log('[Store] Adding project with workspace ID:', workspaceId);
     
-    // Generate ID if not provided
-    const projectId = project.id || genId('p');
-    
+    // Don't generate ID - let database create UUID
     const newProject = {
-      id: projectId,
       workspace_id: workspaceId,
       client_id: project.client_id || project.clientId || '',
       name: project.name || '',
@@ -422,7 +414,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
     
     console.log('Adding invoice with workspace ID:', workspaceId);
-    const newInvoice = { ...invoice, id: genId('inv'), workspace_id: workspaceId };
+    // Don't generate ID - let database create UUID
+    const newInvoice = { ...invoice, workspace_id: workspaceId };
+    delete newInvoice.id; // Remove any existing ID
     console.log('New invoice data:', newInvoice);
     
     try {
@@ -448,7 +442,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
     
     console.log('Adding retainer with workspace ID:', workspaceId);
-    const newRetainer = { ...retainer, id: genId('ret'), workspace_id: workspaceId };
+    // Don't generate ID - let database create UUID
+    const newRetainer = { ...retainer, workspace_id: workspaceId };
+    delete newRetainer.id; // Remove any existing ID
     console.log('New retainer data:', newRetainer);
     
     try {
@@ -490,7 +486,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
     
     console.log('Adding payment with workspace ID:', workspaceId);
-    const newPayment = { ...payment, id: genId('pay'), workspace_id: workspaceId };
+    // Don't generate ID - let database create UUID
+    const newPayment = { ...payment, workspace_id: workspaceId };
+    delete newPayment.id; // Remove any existing ID
     console.log('New payment data:', newPayment);
     
     try {
@@ -517,11 +515,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     
     console.log('[Store] Adding task with workspace ID:', workspaceId);
     
-    // Generate ID if not provided
-    const taskId = task.id || genId('t');
-    
+    // Don't generate ID - let database create UUID
     const newTask = {
-      id: taskId,
       workspace_id: workspaceId,
       project_id: task.project_id || task.projectId || '',
       title: task.title || '',
@@ -569,7 +564,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
     
     console.log('Adding message with workspace ID:', workspaceId);
-    const newMsg = { ...msg, id: genId('msg'), workspace_id: workspaceId };
+    // Don't generate ID - let database create UUID
+    const newMsg = { ...msg, workspace_id: workspaceId };
+    delete newMsg.id; // Remove any existing ID
     console.log('New message data:', newMsg);
     
     try {
@@ -596,11 +593,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     
     console.log('[Store] Adding meeting with workspace ID:', workspaceId);
     
-    // Generate ID if not provided
-    const meetingId = meeting.id || genId('m');
-    
+    // Don't generate ID - let database create UUID
     const newMeeting = {
-      id: meetingId,
       workspace_id: workspaceId,
       client_id: meeting.client_id || meeting.clientId || '',
       title: meeting.title || '',
@@ -641,7 +635,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
     
     console.log('Adding document with workspace ID:', workspaceId);
-    const newDoc = { ...doc, id: genId('d'), workspace_id: workspaceId };
+    // Don't generate ID - let database create UUID
+    const newDoc = { ...doc, workspace_id: workspaceId };
+    delete newDoc.id; // Remove any existing ID
     console.log('New document data:', newDoc);
     
     try {
@@ -667,7 +663,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
     
     console.log('Adding notification with workspace ID:', workspaceId);
-    const newN = { ...n, id: genId('n'), workspace_id: workspaceId, time: n.time || 'Just now' };
+    // Don't generate ID - let database create UUID
+    const newN = { ...n, workspace_id: workspaceId, time: n.time || 'Just now' };
+    delete newN.id; // Remove any existing ID
     console.log('New notification data:', newN);
     
     try {
