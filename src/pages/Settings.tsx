@@ -26,19 +26,22 @@ export default function Settings() {
   const [workspaceCurrency, setWorkspaceCurrency] = useState(currentWorkspace?.currency || 'INR');
   const [workspaceTimezone, setTimezone] = useState(currentWorkspace?.timezone || 'Asia/Kolkata');
   
-  // Only sync on initial load, not on every change
+  // Sync when currentUser or currentWorkspace changes
   useEffect(() => {
-    if (currentUser && !profileName) {
+    console.log('📝 Settings: currentUser loaded:', currentUser);
+    console.log('📝 Settings: currentWorkspace loaded:', currentWorkspace);
+    
+    if (currentUser) {
       setProfileName(currentUser.name || '');
       setProfileEmail(currentUser.email || '');
     }
-    if (currentWorkspace && !workspaceName) {
+    if (currentWorkspace) {
       setWorkspaceName(currentWorkspace.name || '');
       setWorkspaceSlug(currentWorkspace.slug || '');
       setWorkspaceCurrency(currentWorkspace.currency || 'INR');
       setTimezone(currentWorkspace.timezone || 'Asia/Kolkata');
     }
-  }, []);
+  }, [currentUser, currentWorkspace]);
   
   const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
