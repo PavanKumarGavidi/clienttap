@@ -107,8 +107,10 @@ export default function Leads() {
       return;
     }
     try {
-      console.log('Adding lead:', newLead);
-      const leadData = {
+      console.log('🔍 [Leads.tsx] handleAddLead called');
+      console.log('🔍 [Leads.tsx] newLead state:', newLead);
+      
+      const leadData: any = {
         name: newLead.name,
         company: newLead.company,
         email: newLead.email || '',
@@ -121,10 +123,15 @@ export default function Leads() {
         follow_up: false,
         created_at: new Date().toISOString().split('T')[0],
       };
-      console.log('Lead data:', leadData);
+      
+      // Explicitly remove id field if it exists (safety measure)
+      delete leadData.id;
+      
+      console.log('🔍 [Leads.tsx] leadData being sent to store.addLead:', leadData);
+      console.log('🔍 [Leads.tsx] Does leadData have id field?', 'id' in leadData);
       
       await store.addLead(leadData);
-      console.log('Lead added successfully');
+      console.log('✅ [Leads.tsx] Lead added successfully');
       
       await store.addNotification({
         type: 'payment',

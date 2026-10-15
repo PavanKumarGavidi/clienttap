@@ -112,33 +112,53 @@ export const storage = {
     collection: K,
     item: any
   ): Promise<any> {
-    console.log(`[Storage] Adding ${collection} to workspace ${workspaceId}`);
-    console.log('[Storage] Item data:', item);
+    console.log(`🔍 [Storage] addItem called for ${collection}`);
+    console.log('🔍 [Storage] workspaceId:', workspaceId);
+    console.log('🔍 [Storage] item received:', item);
+    console.log('🔍 [Storage] Does item have id field?', 'id' in item);
+    if ('id' in item) {
+      console.log('🔍 [Storage] item.id value:', item.id);
+    }
     
     // Remove id field - let database generate UUID
     const { id, ...itemWithoutId } = item;
     
+    // Double-check: explicitly remove id if it still exists (safety measure)
+    if ('id' in itemWithoutId) {
+      delete itemWithoutId.id;
+      console.log('⚠️ [Storage] WARNING: id field was present in itemWithoutId, removed it');
+    }
+    
+    console.log('🔍 [Storage] After removing id, itemWithoutId:', itemWithoutId);
+    console.log('🔍 [Storage] Does itemWithoutId have id field?', 'id' in itemWithoutId);
+    
     // Ensure all required fields are present
-    const dataToInsert = {
+    const dataToInsert: any = {
       ...itemWithoutId,
       workspace_id: workspaceId,
     };
     
-    console.log('[Storage] Inserting data (without id):', dataToInsert);
+    // Triple-check: ensure no id field in final data
+    delete dataToInsert.id;
     
+    console.log('🔍 [Storage] Final dataToInsert:', dataToInsert);
+    console.log('🔍 [Storage] Does dataToInsert have id field?', 'id' in dataToInsert);
+    
+    console.log('🔍 [Storage] Calling Supabase insert...');
     const { data, error } = await supabase
       .from(collection)
       .insert([dataToInsert])
       .select();
     
     if (error) {
-      console.error(`[Storage] Error adding ${collection}:`, error);
-      console.error('[Storage] Error details:', error.message);
-      console.error('[Storage] Error code:', error.code);
+      console.error(`❌ [Storage] Error adding ${collection}:`, error);
+      console.error('❌ [Storage] Error details:', error.message);
+      console.error('❌ [Storage] Error code:', error.code);
+      console.error('❌ [Storage] Full error object:', JSON.stringify(error, null, 2));
       throw new Error(`Failed to add ${collection}: ${error.message}`);
     }
     
-    console.log(`[Storage] ${collection} added successfully:`, data);
+    console.log(`✅ [Storage] ${collection} added successfully:`, data);
     return data;
   },
 

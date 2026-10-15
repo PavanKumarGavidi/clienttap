@@ -196,16 +196,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   
   // Lead actions
   const addLead = async (lead: any) => {
+    console.log('🔍 [StoreContext] addLead called with:', lead);
+    console.log('🔍 [StoreContext] Does lead have id field?', 'id' in lead);
+    
     const workspaceId = getWorkspaceId();
     if (!workspaceId) {
-      console.error('[Store] Cannot add lead: no workspace ID');
+      console.error('❌ [StoreContext] Cannot add lead: no workspace ID');
       throw new Error('No workspace ID available');
     }
     
-    console.log('[Store] Adding lead with workspace ID:', workspaceId);
+    console.log('🔍 [StoreContext] workspaceId:', workspaceId);
     
     // Don't generate ID - let database create UUID
-    const newLead = {
+    const newLead: any = {
       workspace_id: workspaceId,
       name: lead.name || '',
       company: lead.company || '',
@@ -220,11 +223,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       created_at: lead.created_at || new Date().toISOString(),
     };
     
-    console.log('[Store] New lead data:', newLead);
+    // Explicitly remove id field if it exists (safety measure)
+    delete newLead.id;
+    
+    console.log('🔍 [StoreContext] newLead object created:', newLead);
+    console.log('🔍 [StoreContext] Does newLead have id field?', 'id' in newLead);
     
     try {
+      console.log('🔍 [StoreContext] Calling storage.addItem...');
       const result = await storage.addItem(workspaceId, 'leads', newLead);
-      console.log('[Store] Lead added to Supabase successfully:', result);
+      console.log('✅ [StoreContext] Lead added to Supabase successfully:', result);
       
       // Refresh data from Supabase to get the database-generated UUID
       const data = await storage.getData(workspaceId);
