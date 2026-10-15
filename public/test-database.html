@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Test - ClientTap</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #ea580c; }
+        .test-result {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid;
+        }
+        .success {
+            background: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .error {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .info {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            color: #1e40af;
+        }
+        button {
+            background: #ea580c;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #c2410c;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .step {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Database Diagnostic Tool</h1>
+        <p>This tool will help diagnose why data isn't saving to your database.</p>
+        
+        <div id="results"></div>
+        
+        <button onclick="runAllTests()">🧪 Run All Tests</button>
+        <button onclick="clearResults()">🗑️ Clear Results</button>
+        
+        <div class="step">
+            <h3>📋 Before Running Tests:</h3>
+            <ol>
+                <li>Make sure you're logged in to the app</li>
+                <li>Open browser console (F12) to see detailed logs</li>
+                <li>Click "Run All Tests" below</li>
+                <li>Share the results with me if there are errors</li>
+            </ol>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://owlqbljiitreewqtiewx.supabase.co';
+        const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im93bHFibGppaXRyZWV3cXRpZXd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE1NDQwNjksImV4cCI6MjEwNzEyMDA2OX0.bQBssYKPIrFBAI5Nv8lOkZH2fcBP1SciV-kcAQt_a5U';
+
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        function addResult(type, title, message, details = null) {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${type}`;
+            
+            let html = `<strong>${title}</strong><br>${message}`;
+            if (details) {
+                html += `<pre>${JSON.stringify(details, null, 2)}</pre>`;
+            }
+            
+            resultDiv.innerHTML = html;
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        async function testAuth() {
+            addResult('info', '🔐 Test 1: Authentication', 'Checking if user is logged in...');
+            
+            const {  { user }, error } = await supabase.auth.getUser();
+            
+            if (error) {
+                addResult('error', '❌ Authentication Failed', error.message, error);
+                return false;
+            }
+            
+            if (!user) {
+                addResult('error', '❌ Not Logged In', 'Please log in to the app first');
+                return false;
+            }
+            
+            addResult('success', '✅ Authentication Successful', `Logged in as: ${user.email}`, { user_id: user.id });
+            return true;
+        }
+
+        async function testWorkspace() {
+            addResult('info', '🏢 Test 2: Workspace', 'Checking if workspace exists...');
+            
+            const {  { user } } = await supabase.auth.getUser();
+            if (!user) return false;
+
+            const {  workspace, error } = await supabase
+                .from('workspaces')
+                .select('*')
+                .eq('owner_id', user.id)
+                .single();
+
+            if (error) {
+                addResult('error', '❌ Workspace Check Failed', error.message, error);
+                if (error.message.includes('relation') && error.message.includes('does not exist')) {
+                    addResult('error', '💡 Solution', 'Database tables do not exist. Please run fresh-database.sql in Supabase SQL Editor.');
+                }
+                return false;
+            }
+            
+            if (!workspace) {
+                addResult('error', '❌ No Workspace Found', 'No workspace found for this user');
+                return false;
+            }
+            
+            addResult('success', '✅ Workspace Found', `Workspace: ${workspace.name}`, { workspace_id: workspace.id });
+            return true;
+        }
+
+        async function testTableStructure() {
+            addResult('info', '📊 Test 3: Table Structure', 'Checking if leads table exists...');
+            
+            const { data, error } = await supabase
+                .from('leads')
+                .select('*')
+                .limit(1);
+
+            if (error) {
+                addResult('error', '❌ Table Check Failed', error.message, error);
+                if (error.message.includes('relation') && error.message.includes('does not exist')) {
+                    addResult('error', '💡 Solution', 'The leads table does not exist. Please run fresh-database.sql in Supabase SQL Editor.');
+                }
+                return false;
+            }
+            
+            addResult('success', '✅ Table Exists', 'Leads table is accessible');
+            if (data && data.length > 0) {
+                addResult('info', '📋 Table Columns', 'Columns found:', Object.keys(data[0]));
+            }
+            return true;
+        }
+
+        async function testInsert() {
+            addResult('info', '➕ Test 4: Insert Test', 'Trying to insert a test lead...');
+            
+            const {  { user } } = await supabase.auth.getUser();
+            if (!user) return false;
+
+            const {  workspace } = await supabase
+                .from('workspaces')
+                .select('id')
+                .eq('owner_id', user.id)
+                .single();
+
+            if (!workspace) {
+                addResult('error', '❌ No Workspace', 'Cannot insert without workspace');
+                return false;
+            }
+
+            const testLead = {
+                id: `test_${Date.now()}`,
+                workspace_id: workspace.id,
+                name: 'Test Lead',
+                company: 'Test Company',
+                email: 'test@example.com',
+                phone: '+1234567890',
+                value: 10000,
+                currency: 'INR',
+                stage: 'new',
+                source: 'website',
+                assigned_to: '',
+                follow_up: false,
+                created_at: new Date().toISOString(),
+            };
+
+            addResult('info', '📝 Insert Data', 'Attempting to insert:', testLead);
+
+            const { data, error } = await supabase
+                .from('leads')
+                .insert([testLead])
+                .select();
+
+            if (error) {
+                addResult('error', '❌ Insert Failed', error.message, {
+                    error: error,
+                    code: error.code,
+                    details: error.details,
+                    hint: error.hint
+                });
+                
+                if (error.code === '23503') {
+                    addResult('error', '💡 Foreign Key Error', 'The workspace_id does not exist in the workspaces table. This means your workspace was not created properly.');
+                } else if (error.code === '23505') {
+                    addResult('error', '💡 Duplicate Key Error', 'A record with this ID already exists. Try again.');
+                } else if (error.message.includes('null value')) {
+                    addResult('error', '💡 Missing Required Field', 'A required field is missing. Check the error details above.');
+                }
+                
+                return false;
+            }
+            
+            addResult('success', '✅ Insert Successful', 'Test lead was inserted successfully', data);
+            return true;
+        }
+
+        async function testRead() {
+            addResult('info', '📖 Test 5: Read Test', 'Trying to read leads...');
+            
+            const {  { user } } = await supabase.auth.getUser();
+            if (!user) return false;
+
+            const {  workspace } = await supabase
+                .from('workspaces')
+                .select('id')
+                .eq('owner_id', user.id)
+                .single();
+
+            if (!workspace) return false;
+
+            const { data, error } = await supabase
+                .from('leads')
+                .select('*')
+                .eq('workspace_id', workspace.id);
+
+            if (error) {
+                addResult('error', '❌ Read Failed', error.message, error);
+                return false;
+            }
+            
+            addResult('success', '✅ Read Successful', `Found ${data?.length || 0} leads`, data);
+            return true;
+        }
+
+        window.runAllTests = async function() {
+            document.getElementById('results').innerHTML = '';
+            addResult('info', '🚀 Starting Tests', 'Running all diagnostic tests...');
+            
+            const results = {
+                auth: await testAuth(),
+                workspace: await testWorkspace(),
+                tableStructure: await testTableStructure(),
+                insert: await testInsert(),
+                read: await testRead(),
+            };
+            
+            addResult('info', '📊 Summary', 'Test Results:', results);
+            
+            const allPassed = Object.values(results).every(r => r);
+            if (allPassed) {
+                addResult('success', '🎉 All Tests Passed!', 'Your database is working correctly. If you still see errors in the app, please share the console logs.');
+            } else {
+                addResult('error', '⚠️ Some Tests Failed', 'Please follow the solutions provided above for each failed test.');
+            }
+        };
+
+        window.clearResults = function() {
+            document.getElementById('results').innerHTML = '';
+        };
+
+        // Auto-run tests on page load
+        window.addEventListener('load', () => {
+            addResult('info', '👋 Welcome', 'Click "Run All Tests" to start diagnosing your database connection.');
+        });
+    </script>
+</body>
+</html>

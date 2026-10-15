@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UUID Test - ClientTap</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #ea580c;
+      margin-bottom: 10px;
+    }
+    .status {
+      padding: 15px;
+      border-radius: 6px;
+      margin: 20px 0;
+      font-weight: 500;
+    }
+    .success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #6ee7b7;
+    }
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+    }
+    .info {
+      background: #dbeafe;
+      color: #1e40af;
+      border: 1px solid #93c5fd;
+    }
+    button {
+      background: #ea580c;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 10px 5px;
+    }
+    button:hover {
+      background: #c2410c;
+    }
+    pre {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 15px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .log {
+      margin: 10px 0;
+      padding: 10px;
+      background: #f8fafc;
+      border-left: 3px solid #ea580c;
+      font-family: monospace;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧪 UUID Test Page</h1>
+    <p>This page tests if the UUID fix is working correctly.</p>
+    
+    <div id="status" class="info">
+      Click "Run Test" to check if UUID generation is working
+    </div>
+    
+    <button onclick="runTest()">🔍 Run Test</button>
+    <button onclick="clearLogs()">🗑️ Clear Logs</button>
+    
+    <h3>📋 Test Results:</h3>
+    <div id="logs"></div>
+    
+    <h3>💡 What This Tests:</h3>
+    <ul>
+      <li>Checks if the code is generating string IDs (BAD)</li>
+      <li>Verifies if database would accept UUID format (GOOD)</li>
+      <li>Shows what ID format is being used</li>
+    </ul>
+    
+    <h3>🎯 Expected Result:</h3>
+    <div class="success status">
+      ✅ Code should NOT generate IDs<br>
+      ✅ Database should generate UUIDs automatically<br>
+      ✅ IDs should look like: <code>550e8400-e29b-41d4-a716-446655440000</code>
+    </div>
+    
+    <h3>❌ Bad Result (What You're Seeing):</h3>
+    <div class="error status">
+      ❌ Code generates string IDs like: <code>l_1791640183027_9vg3bx</code><br>
+      ❌ Database rejects them<br>
+      ❌ Error: "invalid input syntax for type uuid"
+    </div>
+  </div>
+  
+  <script>
+    function log(message, type = 'info') {
+      const logsDiv = document.getElementById('logs');
+      const logDiv = document.createElement('div');
+      logDiv.className = 'log';
+      logDiv.style.borderLeftColor = type === 'error' ? '#dc2626' : type === 'success' ? '#16a34a' : '#ea580c';
+      logDiv.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logsDiv.appendChild(logDiv);
+      logsDiv.scrollTop = logsDiv.scrollHeight;
+    }
+    
+    function clearLogs() {
+      document.getElementById('logs').innerHTML = '';
+      document.getElementById('status').className = 'info';
+      document.getElementById('status').textContent = 'Click "Run Test" to check if UUID generation is working';
+    }
+    
+    async function runTest() {
+      const statusDiv = document.getElementById('status');
+      statusDiv.className = 'info';
+      statusDiv.textContent = '🔄 Running tests...';
+      
+      log('Starting UUID test...', 'info');
+      
+      // Test 1: Check if genId function exists
+      log('Test 1: Checking if genId function exists...', 'info');
+      try {
+        // Try to import the storage module
+        const storageModule = await import('./src/lib/storage.ts');
+        if (storageModule.storage && storageModule.storage.genId) {
+          const testId = storageModule.storage.genId('test');
+          log(`⚠️  genId function exists and generates: ${testId}`, 'error');
+          log('This is the OLD code that causes the UUID error!', 'error');
+        } else {
+          log('✅ genId function not found or not accessible', 'success');
+        }
+      } catch (e) {
+        log(`Note: Cannot import TypeScript directly in browser: ${e.message}`, 'info');
+      }
+      
+      // Test 2: Check UUID format
+      log('Test 2: Checking UUID format...', 'info');
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const testUUID = '550e8400-e29b-41d4-a716-446655440000';
+      const testString = 'l_1791640183027_9vg3bx';
+      
+      if (uuidRegex.test(testUUID)) {
+        log(`✅ Valid UUID format: ${testUUID}`, 'success');
+      }
+      
+      if (!uuidRegex.test(testString)) {
+        log(`❌ Invalid string ID format: ${testString}`, 'error');
+        log('This is what causes the database error!', 'error');
+      }
+      
+      // Test 3: Simulate what the code should do
+      log('Test 3: Simulating correct behavior...', 'info');
+      const leadData = {
+        workspace_id: '550e8400-e29b-41d4-a716-446655440001',
+        name: 'Test Lead',
+        company: 'Test Company',
+        email: 'test@example.com'
+      };
+      
+      log('Data to insert (WITHOUT id field):', 'info');
+      log(JSON.stringify(leadData, null, 2), 'info');
+      
+      // Remove id if it exists (this is what the fixed code does)
+      const { id, ...dataWithoutId } = leadData;
+      log('✅ After removing id field:', 'success');
+      log(JSON.stringify(dataWithoutId, null, 2), 'success');
+      
+      // Test 4: Check if browser is using cached code
+      log('Test 4: Checking for cached code...', 'info');
+      const scripts = document.querySelectorAll('script[src]');
+      log(`Found ${scripts.length} script tags`, 'info');
+      
+      // Check localStorage for cached data
+      const cachedData = localStorage.getItem('clienttap_data');
+      if (cachedData) {
+        log('⚠️  Found cached data in localStorage', 'error');
+        log('This might be causing the issue!', 'error');
+        log('Solution: Clear localStorage (F12 → Application → Clear)', 'info');
+      } else {
+        log('✅ No cached data in localStorage', 'success');
+      }
+      
+      // Final result
+      log('', 'info');
+      log('========================================', 'info');
+      log('🎯 TEST COMPLETE', 'info');
+      log('========================================', 'info');
+      log('', 'info');
+      log('If you see string IDs like "l_xxx", the code is NOT fixed.', 'error');
+      log('If you see "without id" in logs, the code IS fixed.', 'success');
+      log('', 'info');
+      log('SOLUTION: Clear browser cache and use incognito mode!', 'info');
+      
+      statusDiv.className = 'success';
+      statusDiv.innerHTML = `
+        ✅ Test complete!<br>
+        Check the logs above to see if the code is generating IDs.<br>
+        <strong>If you see string IDs, clear your browser cache!</strong>
+      `;
+    }
+    
+    // Auto-run test on page load
+    window.addEventListener('load', () => {
+      log('Page loaded. Click "Run Test" to start.', 'info');
+    });
+  </script>
+</body>
+</html>

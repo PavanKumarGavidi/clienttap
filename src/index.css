@@ -1,0 +1,238 @@
+@import "tailwindcss";
+
+@theme {
+  /* Primary orange scale - exact tokens */
+  --color-primary-50: #fff7ed;
+  --color-primary-100: #ffedd5;
+  --color-primary-200: #fed7aa;
+  --color-primary-300: #fdba74;
+  --color-primary-400: #fb923c;
+  --color-primary-500: #f97316;
+  --color-primary-600: #ea580c;
+  --color-primary-700: #c2410c;
+  --color-primary-800: #9a3412;
+  --color-primary-900: #7c2d12;
+
+  /* Canvas and surface */
+  --color-canvas: #FAFAF8;
+  --color-surface: #FFFFFF;
+  --color-bone: #FFF8F2;
+  --color-cream: #FAEFE2;
+
+  /* Ink (text) */
+  --color-ink: #1C1917;
+  --color-ink-muted: #78716C;
+  --color-ink-faint: #A8A29E;
+
+  /* Lines */
+  --color-line: #E7E5E4;
+  --color-line-soft: rgba(231, 229, 228, 0.6);
+
+  /* Espresso (dark sections) */
+  --color-espresso: #17100B;
+  --color-espresso-soft: #231710;
+  --color-espresso-line: #3B291D;
+  --color-espresso-text: #EFE4D8;
+  --color-espresso-muted: #A08A76;
+
+  /* Terracotta */
+  --color-terracotta-300: #EFA184;
+  --color-terracotta-400: #E2794A;
+  --color-terracotta-500: #CE5C36;
+  --color-terracotta-600: #AE4626;
+
+  /* Fonts */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Inter', system-ui, sans-serif;
+  --font-serif-display: 'Instrument Serif', serif;
+
+  /* Shadows - warm-tinted */
+  --shadow-soft: 0 1px 2px 0 rgba(28, 25, 23, 0.04), 0 1px 3px 0 rgba(28, 25, 23, 0.05);
+  --shadow-soft-md: 0 2px 8px -2px rgba(28, 25, 23, 0.06), 0 6px 20px -4px rgba(28, 25, 23, 0.06);
+  --shadow-soft-lg: 0 10px 40px -8px rgba(28, 25, 23, 0.12);
+  --shadow-up: 0 -1px 3px rgba(28, 25, 23, 0.04);
+  --shadow-lift-1: 0 1px 2px rgba(67, 36, 16, 0.05), 0 3px 8px -2px rgba(67, 36, 16, 0.05);
+  --shadow-lift-2: 0 2px 4px rgba(67, 36, 16, 0.05), 0 10px 24px -6px rgba(67, 36, 16, 0.09);
+  --shadow-lift-3: 0 4px 8px rgba(67, 36, 16, 0.05), 0 22px 48px -12px rgba(67, 36, 16, 0.14);
+  --shadow-lift-4: 0 8px 16px rgba(67, 36, 16, 0.06), 0 40px 80px -20px rgba(67, 36, 16, 0.20);
+  --shadow-ember: 0 18px 48px -16px rgba(234, 88, 12, 0.45);
+  --shadow-ember-lg: 0 30px 80px -24px rgba(234, 88, 12, 0.55);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography scale */
+.text-display-sm {
+  font-size: 2.5rem;
+  line-height: 1.08;
+  letter-spacing: -0.022em;
+}
+
+.text-display {
+  font-size: 3.25rem;
+  line-height: 1.04;
+  letter-spacing: -0.027em;
+}
+
+.text-display-lg {
+  font-size: 4.25rem;
+  line-height: 1;
+  letter-spacing: -0.032em;
+}
+
+.text-display-xl {
+  font-size: 6rem;
+  line-height: 0.94;
+  letter-spacing: -0.038em;
+}
+
+.font-serif-display {
+  font-family: var(--font-serif-display);
+  font-style: italic;
+}
+
+/* Measure for body copy */
+.max-w-measure {
+  max-width: 34rem;
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-22px); }
+}
+
+@keyframes blob {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes gradient-pan {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fade-in-fast {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes sheen {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes drift {
+  0%, 100% { opacity: 0.3; transform: translate(0, 0); }
+  50% { opacity: 0.5; transform: translate(20px, -20px); }
+}
+
+@keyframes wave-x {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes wave-x-reverse {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-float-slow { animation: float-slow 9s ease-in-out infinite; }
+.animate-blob { animation: blob 14s ease-in-out infinite; }
+.animate-marquee { animation: marquee 32s linear infinite; }
+.animate-gradient-pan { animation: gradient-pan 6s ease infinite; }
+.animate-fade-in { animation: fade-in 0.6s ease-out; }
+.animate-fade-in-fast { animation: fade-in-fast 0.2s ease-out; }
+.animate-slide-up { animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+.animate-sheen {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  background-size: 200% 100%;
+  animation: sheen 5.5s ease-in-out infinite;
+}
+.animate-drift { animation: drift 16s ease-in-out infinite; }
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-line); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-ink-faint); }
+
+/* Card base */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: 1rem;
+  box-shadow: var(--shadow-soft);
+}
+
+/* Primary CTA with ember glow */
+.btn-primary {
+  background: var(--color-primary-600);
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-ember);
+  transition: all 0.2s;
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-700);
+  box-shadow: var(--shadow-ember-lg);
+  transform: translateY(-1px);
+}
+
+/* Mobile bottom nav shadow */
+.mobile-bottom-nav {
+  box-shadow: var(--shadow-up);
+}
+
+/* Kanban */
+.kanban-card {
+  cursor: grab;
+}
+
+.kanban-card:active {
+  cursor: grabbing;
+}
